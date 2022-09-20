@@ -1,0 +1,24 @@
+{
+  "name": "rush-manager-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon rush-manager-backend/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rosenas/CSSE433-RushManager.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rosenas/CSSE433-RushManager/issues"
+  },
+  "homepage": "https://github.com/rosenas/CSSE433-RushManager#readme",
+  "dependencies": {
+    "express": "^4.18.1",
+    "nodemon": "^2.0.20"
+  }
+}
