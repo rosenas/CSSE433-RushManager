@@ -3,6 +3,8 @@ import { useState } from 'react';
 import {default as Login} from "../Login/Login"
 import {default as ViewRushees} from "../Brother/viewRushees"
 import {default as RushEvents} from "../Rushee/rushEvents"
+import {default as RushEvents_Brother} from "../Brother/rushEvents"
+import {default as Navigation_Brother} from "../Brother/navigation"
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 
@@ -30,7 +32,12 @@ function LoggedInRouter(props){
         
         return (
             <Router>
+                <Navigation_Brother/>
                  <Routes>
+                    <Route path="/rushEvents" element={<RushEvents_Brother/>}/>
+
+                    <Route path="/viewRushees" element={<ViewRushees/>}/>
+
                     <Route path= "*" element={<ViewRushees/>}/>
                 </Routes>
             </Router>

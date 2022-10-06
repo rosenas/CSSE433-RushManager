@@ -31,6 +31,18 @@ app.get("/getEvents", async (req, res) => {
   res.send(events)
 })
 
+app.post("/addEvent", (req, res) => {
+  let name = req.body.name 
+  let date = req.body.date
+
+  events.push({"name": name, "date": date})
+
+  console.log(req.body)
+  console.log(date)
+
+  res.send({"status": "success"})
+})
+
 let rushees = [
   {
     "name": "Ari Rosen",
@@ -51,6 +63,10 @@ let rushees = [
   {
     "name": "Garrett Loyed",
     "info": "Not rushing"
+  },
+  {
+    "name": "Ethan Swanner",
+    "info": "Fat"
   }
 
 ]

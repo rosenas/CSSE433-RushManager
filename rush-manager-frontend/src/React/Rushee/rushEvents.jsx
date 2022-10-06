@@ -1,7 +1,9 @@
 import React from "react";
 import { useState } from 'react';
 import Card from 'react-bootstrap/Card';
+import Button from 'react-bootstrap/Button'
 import "../../CSS/index.css"
+
 
 
 
@@ -44,7 +46,7 @@ function RushEvent(props){
         <Card.Text>
             {props.rushee.date}
         </Card.Text>
-        <button>RSVP</button>
+        <Button variant="outline-info">RSVP</Button>
       </Card.Body>
     </Card>
   );

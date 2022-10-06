@@ -46,8 +46,11 @@ function RusheeCard(props){
         <Card.Text>
             {props.rushee.info}
         </Card.Text>
-        <Button variant="primary">Leave a comment</Button>
-        <Button variant="primary">Like</Button>
+        <div>
+          <Button variant="outline-info">Leave a comment</Button>
+          <Button variant="outline-success">Like</Button>
+        </div>
+      
       </Card.Body>
     </Card>
   );
