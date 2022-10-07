@@ -1,27 +1,26 @@
 import React from "react";
+import Nav from "react-bootstrap/Nav"
 import { NavLink } from "react-router-dom";
 
 
 function Navigation(){
 
-    return(
-        <div className="navigation">
-            <nav variant= "tabs" className="navbar navbar-expand">
-                <div className="nav_container">
-                    <div className="nav_item">
-                        <NavLink className="nav-link" to="/rushEvents">
-                            Rush Events
-                        </NavLink>
-                    </div>
-                    <div className="nav_item">
-                        <NavLink className="nav-link" to="/rushees">
-                            Rushees
-                        </NavLink>
-                    </div>
-                </div>
-            </nav>
-        </div>
+    return (
+        <Nav variant="tabs">
+             <Nav.Item>
+                <Nav.Link >
+                    <NavLink to="/rushees">Rushees</NavLink>
+                </Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+                <Nav.Link>
+                    <NavLink to="/rushEvents">Rush Events</NavLink> 
+                </Nav.Link>
+            </Nav.Item>
+        </Nav>
     )
+
+   
 }
 
 export default Navigation

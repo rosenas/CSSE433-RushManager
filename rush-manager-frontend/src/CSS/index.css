@@ -53,3 +53,28 @@
     display: flex;
     justify-content: center;
 }
+
+
+.createAccount{
+    padding-top: 50px;
+    padding-bottom: 25px;
+}
+
+.Rushee-Buttons{
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.Modal-Table{
+    display: flex;
+    justify-content: center;
+
+}
+
+
+table, th, td{
+    padding: 3px;
+    background-color:grey;
+    border: 1px solid;
+}

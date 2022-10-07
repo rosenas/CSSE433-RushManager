@@ -39,14 +39,45 @@ function RushEvents(){
 }
 
 function RushEvent(props){
+
+  const [rsvp, setRSVP] = useState(false)
+
+    const handleRSVP = () => {
+        setRSVP(true)
+    }
+
+    const handleUnRSVP = () => {
+        setRSVP(false)
+    }
+
+    const RSVP_Button = () => {
+        if(rsvp){
+          return(
+            <Button onClick={handleUnRSVP} variant="outline-danger">Un-RSVP</Button>
+          )
+          
+        }
+        else{
+          return(
+            <Button onClick={handleRSVP} variant="outline-success">RSVP</Button>
+          )
+          
+        }
+    }
+
+
   return (
     <Card style={{ width: '12rem' }}>
       <Card.Body>
         <Card.Title>{props.rushee.name}</Card.Title>
         <Card.Text>
             {props.rushee.date}
+            <div>
+              <RSVP_Button />
+            </div>
         </Card.Text>
-        <Button variant="outline-info">RSVP</Button>
+       
+        
       </Card.Body>
     </Card>
   );

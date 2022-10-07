@@ -131,7 +131,7 @@ function RushEvents(){
         
         <h1 className="title">Rush Events</h1>
         <div className="container">
-            {events && events.map((rushee) => <RushEvent rushee={rushee}/>)}
+            {events && events.map((rushee) => <RushEvent event={rushee}/>)}
         </div>
         <div className= "add">
             <Button variant="light" onClick={handleAddRushEvent}>Add Rush Event</Button>
@@ -143,17 +143,63 @@ function RushEvents(){
 }
 
 function RushEvent(props){
-  return (
-    <Card style={{ width: '12rem' }}>
-      <Card.Body>
-        <Card.Title>{props.rushee.name}</Card.Title>
-        <Card.Text>
-            {props.rushee.date}
-        </Card.Text>
-        <Button variant="outline-info">More Info</Button>
-      </Card.Body>
-    </Card>
-  );
+
+    const [moreInfo, setMoreInfo] = useState(false)
+
+    const handleMoreInfo = () => {
+        setMoreInfo(true)
+    }
+
+    const handleClose = () => {
+        setMoreInfo(false)
+    }
+
+    const MoreInfo_Modal = () => {
+        return (
+            <Modal show={moreInfo} onHide={handleClose}>
+                <Modal.Header closeButton />
+                <Modal.Title className="Modal-Title"> Info about {props.event.name} </Modal.Title>
+                <Modal.Body>
+                    <div className="Modal-Table">
+                        <table>
+                            <tbody>
+                            <tr>
+                                <th>Rushee Name</th>
+                                <th>Likes</th>
+                                <th>More info</th>
+                            </tr>
+                                {props.event.attending && props.event.attending.map((rushee) => {
+                                    return (
+                                        <tr>
+                                            <td>{rushee.name}</td>
+                                            <td>{rushee.likes}</td>
+                                            <td><Button>More Info</Button></td>
+                                        </tr>
+                                    )
+
+                            })}
+                            </tbody>
+                            
+
+                        </table>
+                    </div>
+                </Modal.Body>
+            </Modal>
+       )
+    }
+
+    return (
+        <Card style={{ width: '12rem' }}>
+            <Card.Body>
+                <Card.Title>{props.event.name}</Card.Title>
+                <Card.Text>
+                    {props.event.date}
+                </Card.Text>
+                <Button onClick={handleMoreInfo} variant="outline-info">More Info</Button>
+            </Card.Body>
+            <MoreInfo_Modal/>
+        </Card>
+    );
 }
 
 
