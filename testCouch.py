@@ -3,37 +3,11 @@ import couchdb
 #couch = couchdb.Server()
 couch = couchdb.Server('http://testUser:password@localhost:5984/')
 
-#couch = couchdb.Server('https://admin:mysecretpassword@127.0.0.1:5984/')
-#print(couch)
-
-
-#db = couch.create('testdb') # newly created
 db = couch['testdb'] # existing
-#print(db)
-#print(couch.config())
-#doc = {'foo': 'bar'}
-#db.save(doc)
-#print(doc)
-#for id in db:
-    #print(id['foo'])
-#doc = {'type': 'person', 'name': 'Grant'}
-#db.save(doc)
 
-#doc = {'type': 'person', 'name': 'Ari'}
-#db.save(doc)
-
-#doc = {'type': 'person', 'name': 'Jared'}
-#db.save(doc)
 
 getRushees = {'selector': {'type': 'rushee'}}
 
-
-#for row in db.find(mango):                          
-    #print(row['name'])    
-
-#couch.delete('testdb')
-
-#print(db)
 
 def main():
     while(True):
