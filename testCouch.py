@@ -6,23 +6,6 @@ couch = couchdb.Server('http://testUser:password@localhost:5984/')
 db = couch['testdb'] # existing
 
 
-getRushees = {'selector': {'type': 'rushee'}}
-
-
-# FraternityMember: {
-# 	FirstName:
-# 	LastName:
-# 	Major:
-# Interests: [  ]
-# 	Fraternity:
-# 	ProfilePicture: *imageUrl
-# 	Email:
-# 	PhoneNumber:	
-# 	IsRushLeader: 
-# }
-
-
-
 def main():
     while(True):
         inp = str(input("~"))
@@ -159,10 +142,16 @@ def main():
             for doc in res:
                 print(doc)
 
-        #delete rushee
-        elif(inp == "delR"):
+        #delete rushee/ brother
+        elif(inp == "del"):
+            type = str(input("(B)rother/ (R)ushee: "))
+            if(type == "B"):
+                type = "brother"
+            elif(type == "R"):
+                type = "rushee"
             rushee = str(input("Rushee: "))
-            rusheeQuery = {'selector': {'$and': [{'type': 'rushee'}, {'$or': [{'email': rushee}, {'username': rushee}]}]}}
+
+            rusheeQuery = {'selector': {'$and': [{'type': type}, {'$or': [{'email': rushee}, {'username': rushee}]}]}}
             res = db.find(rusheeQuery)
             for doc in res:
                 db.delete(doc)
