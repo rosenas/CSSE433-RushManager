@@ -9,11 +9,48 @@ db = couch['testdb'] # existing
 getRushees = {'selector': {'type': 'rushee'}}
 
 
+# FraternityMember: {
+# 	FirstName:
+# 	LastName:
+# 	Major:
+# Interests: [  ]
+# 	Fraternity:
+# 	ProfilePicture: *imageUrl
+# 	Email:
+# 	PhoneNumber:	
+# 	IsRushLeader: 
+# }
+
+
+
 def main():
     while(True):
         inp = str(input("~"))
         if(inp == "e"):
             break
+
+        #add brother
+        elif(inp == "ab"):
+            first = str(input("First: "))
+            last = str(input("Last: "))
+            username = str(input("Username: "))
+            phone = str(input("Phone: "))
+            email = str(input("Email: "))
+            major = str(input("Major: "))
+            fraternity = str(input("Fraternity: "))
+            doc = {
+                'type': 'brother',
+                'first': first,
+                'last': last,
+                'email': email,
+                'major': major,
+                'username': username,
+                'phone': phone,
+                'interests': [],
+                'fraternity': fraternity
+            }
+            db.save(doc)
+
 
         #add rushee
         elif(inp == "ar"):
@@ -32,6 +69,7 @@ def main():
                 'email': email,
                 'major': major,
                 'reshall': reshall,
+                'interests': [],
                 'fraternitiesInterestedIn': [],
                 'username': username,
                 'phone': phone,
@@ -67,17 +105,34 @@ def main():
             }
             db.save(doc)
 
-        #get all rushees
+        #get all rushees/ brothers
         elif(inp == "get"):
-            res = db.find(getRushees)
-            for row in res:
-                print(row)
+            type = str(input("(B)rother/ (R)ushee: "))
+            if(type == "B" or type == "R"):
+                if(type == "B"):
+                    frat = str(input("Fraternity: "))
+                    type = "brother"
+                    getQuery = {'selector': {'$and': [{'type': type}, {'fraternity': frat}]}}
+                elif(type == "R"):
+                    type = "rushee"
+                    getQuery = {'selector': {'type': type}}
+                
+                res = db.find(getQuery)
+                for row in res:
+                    print(row)
+            else:
+                print("Invalid response")
 
-        #find specific rushee
+        #find specific rushee/ brother
         elif(inp == "find"):
+            type = str(input("(B)rother/ (R)ushee: "))
+            if(type == "B"):
+                type = "brother"
+            elif(type == "R"):
+                type = "rushee"
             inp = str(input("Search criteria: "))
 
-            findRushee = {'selector': {'$and': [{'type': 'rushee'}, {'$or': [{'$and': [{'first': inp}, {'last': inp}]}, {'email': inp}, {'username': inp}, {'first': inp}, {'last': inp}]}]}}
+            findRushee = {'selector': {'$and': [{'type': type}, {'$or': [{'$and': [{'first': inp}, {'last': inp}]}, {'email': inp}, {'username': inp}, {'first': inp}, {'last': inp}]}]}}
             res = db.find(findRushee)
             for row in res:
                 print(row['first'], row['last'], row['email'], row['username'])
