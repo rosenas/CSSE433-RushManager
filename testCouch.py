@@ -15,6 +15,7 @@ def main():
         if(inp == "e"):
             break
 
+        #add rushee
         elif(inp == "ar"):
             first = str(input("First: "))
             last = str(input("Last: "))
@@ -66,11 +67,13 @@ def main():
             }
             db.save(doc)
 
+        #get all rushees
         elif(inp == "get"):
             res = db.find(getRushees)
             for row in res:
                 print(row)
 
+        #find specific rushee
         elif(inp == "find"):
             inp = str(input("Search criteria: "))
 
@@ -79,6 +82,7 @@ def main():
             for row in res:
                 print(row['first'], row['last'], row['email'], row['username'])
 
+        #add that a frat is interested in a rushee
         elif(inp == "addI"):
             frat = str(input("Frat: "))
             rushee = str(input("Rushee: "))
@@ -92,8 +96,8 @@ def main():
                 #for row in res:
                     #print(row['fraternityInfo'])
         
+        #get all rushees a frat is interested in
         elif(inp == "intIn"):
-            #rushees a frat is interested in
             frat = str(input("Frat: "))
             findRushee = {'selector': {'$and': [{'type': 'rushee'}, {'fraternityInfo': {frat: {'interested':True}}}]}}
             res = db.find(findRushee)
