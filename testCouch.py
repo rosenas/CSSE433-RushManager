@@ -86,8 +86,8 @@ def main():
         elif(inp == "addI"):
             frat = str(input("Frat: "))
             rushee = str(input("Rushee: "))
-            findRushee = {'selector': {'$and': [{'type': 'rushee'}, {'$or': [{'email': rushee}, {'username': rushee}]}]}}
-            res = db.find(findRushee)
+            rusheeQuery = {'selector': {'$and': [{'type': 'rushee'}, {'$or': [{'email': rushee}, {'username': rushee}]}]}}
+            res = db.find(rusheeQuery)
             for row in res:
                 doc = db.get(row.id)
                 doc['fraternityInfo'][frat]['interested'] = True
@@ -103,4 +103,13 @@ def main():
             res = db.find(findRushee)
             for doc in res:
                 print(doc)
+
+        #delete rushee
+        elif(inp == "delR"):
+            rushee = str(input("Rushee: "))
+            rusheeQuery = {'selector': {'$and': [{'type': 'rushee'}, {'$or': [{'email': rushee}, {'username': rushee}]}]}}
+            res = db.find(rusheeQuery)
+            for doc in res:
+                db.delete(doc)
+            
 main()
