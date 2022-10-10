@@ -11,6 +11,7 @@ db = None
 print(couch['example'])
 
 
+
 def main():
     while(True):
         inp = str(input("~"))
