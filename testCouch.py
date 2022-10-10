@@ -10,6 +10,7 @@ couch = couchdb.Server('http://admin:couch@137.112.104.178:5984/')
 db = None
 print(couch['example'])
 
+
 def main():
     while(True):
         inp = str(input("~"))
