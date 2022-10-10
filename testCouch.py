@@ -1,10 +1,14 @@
 from ctypes import sizeof
 import couchdb
 #couch = couchdb.Server()
-couch = couchdb.Server('http://testUser:password@localhost:5984/')
+#couch = couchdb.Server('http://testUser:password@localhost:5984/')
+#db = couch['testdb'] # existing
 
-db = couch['testdb'] # existing
-
+couch = couchdb.Server('http://admin:couch@137.112.104.178:5984/')
+#db = couch["example"]
+#db = couch.create('python-tests')
+db = None
+print(couch['example'])
 
 def main():
     while(True):
@@ -113,12 +117,18 @@ def main():
                 type = "brother"
             elif(type == "R"):
                 type = "rushee"
-            inp = str(input("Search criteria: "))
-
-            findRushee = {'selector': {'$and': [{'type': type}, {'$or': [{'$and': [{'first': inp}, {'last': inp}]}, {'email': inp}, {'username': inp}, {'first': inp}, {'last': inp}]}]}}
-            res = db.find(findRushee)
-            for row in res:
-                print(row['first'], row['last'], row['email'], row['username'])
+            if(type == "rushee" or type == "brother"):
+                inp = str(input("Search criteria: "))
+                fullname = inp
+                fullname = fullname.split(' ')
+                if(len(fullname) == 1):
+                    fullname.append("A")
+                findRushee = {'selector': {'$and': [{'type': type}, {'$or': [{'$and': [{'first': fullname[0].strip()}, {'last': fullname[1].strip()}]}, {'email': inp}, {'username': inp}, {'first': inp}, {'last': inp}]}]}}
+                res = db.find(findRushee)
+                for row in res:
+                    print(row['first'], row['last'], row['email'], row['username'])
+            else:
+                print("Invalid response")
 
         #add that a frat is interested in a rushee
         elif(inp == "addI"):
