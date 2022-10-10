@@ -1,0 +1,7 @@
+1. click on the green button in the bottom corner of vs code
+2. click on Connect to a host...
+3. click on add new host
+4. type in ssh -p 22 csse@<hostname>
+    for example it would be ssh -p 22 csse@433-09.csse.rose-hulman.edu
+5. click on linux 
+6. enter password which is Chujah9E
