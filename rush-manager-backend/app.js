@@ -40,10 +40,28 @@ app.get('/', (req, res) => {
 //TODO make this a post and check for verification
 app.get("/getRushees", async (req, res) => {
   res.send(rushees)
+  request('http://localhost:5000/getRushees', {
+    json: true
+  }, (err, res, body) => {
+    if (err) {
+      return console.log(err);
+    }
+    
+    console.log(body);
+  });
 })
 
 app.get("/getEvents", async (req, res) => {
   res.send(events)
+  request('http://localhost:5000/getEvents', {
+    json: true
+  }, (err, res, body) => {
+    if (err) {
+      return console.log(err);
+    }
+    
+    console.log(body);
+  });
 })
 
 app.post("/addEvent", (req, res) => {
@@ -56,6 +74,20 @@ app.post("/addEvent", (req, res) => {
   console.log(date)
 
   res.send({"status": "success"})
+
+  request.post('http://localhost:5000/addEvent', {
+    json: true,
+    body: {
+      test : "test"
+    }
+  }, (err, res, body) => {
+    if (err) {
+      return console.log(err);
+    }
+    
+    console.log(body);
+  });
+
 })
 
 let rushees = [
