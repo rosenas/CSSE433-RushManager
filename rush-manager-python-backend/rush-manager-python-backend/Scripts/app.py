@@ -49,7 +49,12 @@ def addBrother():
 
 @app.route("/deleteBrother")
 def deleteBrother():
-  None
+  searchInput = ""
+  userQuery = {'selector': {'$and': [{'type': "brother"}, {'$or': [{'email': searchInput}, {'username': searchInput}]}]}}
+  res = db.find(userQuery)
+  for doc in res:
+    db.delete(doc)
+  return "Brother deleted"
 
 @app.route("/addRushee")
 def addRushee():
@@ -72,7 +77,7 @@ def addRushee():
   #       'rating': 'none',
   #       'comments': [],
   #       'interested': False,
-  #       'needsDiscussion': 'no'
+  #       'needsDiscussion': False
   #     }
   #   }
   # }
@@ -81,46 +86,106 @@ def addRushee():
 
 @app.route("/deleteRushee")
 def deleteRushee():
-  None
+  searchInput = ""
+  userQuery = {'selector': {'$and': [{'type': "rushee"}, {'$or': [{'email': searchInput}, {'username': searchInput}]}]}}
+  res = db.find(userQuery)
+  for doc in res:
+    db.delete(doc)
+  return "Rushee deleted"
 
 @app.route("/searchBrother")
 def searchBrother():
   #need name, username, etc
-  None
+  inp = ""
+  fullname = inp
+  fullname = fullname.split(' ')
+  if(len(fullname) == 1):
+    fullname.append("A") #handles only giving a first / last name, not a full name
+  findBrother = {'selector': {'$and': [{'type': "brother"}, {'$or': [{'$and': [{'first': fullname[0].strip()}, {'last': fullname[1].strip()}]}, {'email': inp}, {'username': inp}, {'first': inp}, {'last': inp}]}]}}
+  res = db.find(findBrother)
+  for row in res:
+    print(row['first'], row['last'], row['email'], row['username'])
 
 @app.route("/searchRushee")
 def searchRushee():
   #need name, username, etc
-  None
+  inp = ""
+  fullname = inp
+  fullname = fullname.split(' ')
+  if(len(fullname) == 1):
+    fullname.append("A") #handles only giving a first / last name, not a full name
+  findBrother = {'selector': {'$and': [{'type': "brother"}, {'$or': [{'$and': [{'first': fullname[0].strip()}, {'last': fullname[1].strip()}]}, {'email': inp}, {'username': inp}, {'first': inp}, {'last': inp}]}]}}
+  res = db.find(findBrother)
+  for row in res:
+    print(row['first'], row['last'], row['email'], row['username'])
 
-@app.route("/addInterest")
-def addInterest():
+@app.route("/changeFratInterest")
+def changeFratInterest():
   #need rushee's username
-  None
+  inp = ""
+  rusheeQuery = {'selector': {'$and': [{'type': 'rushee'}, {'$or': [{'email': inp}, {'username': inp}]}]}}
+  res = db.find(rusheeQuery)
+  for row in res:
+    doc = db.get(row.id)
+    doc['fraternityInfo']["FIJI"]['interested'] = not doc['fraternityInfo']["FIJI"]['interested']
+    db.save(doc)
 
 @app.route("/changeBid")
 def changeBid():
-  #need rushee's username
-  None
+  inp = ""
+  rusheeQuery = {'selector': {'$and': [{'type': 'rushee'}, {'$or': [{'email': inp}, {'username': inp}]}]}}
+  res = db.find(rusheeQuery)
+  for row in res:
+    doc = db.get(row.id)
+    doc['fraternityInfo']["FIJI"]['bidStatus'] = not doc['fraternityInfo']["FIJI"]['bidStatus']
+    db.save(doc)
 
 @app.route("/addRating")
 def addRating():
   #need rushee's username, rating
-  None
+  inp = ""
+  rating = ""
+  rusheeQuery = {'selector': {'$and': [{'type': 'rushee'}, {'$or': [{'email': inp}, {'username': inp}]}]}}
+  res = db.find(rusheeQuery)
+  for row in res:
+    doc = db.get(row.id)
+    doc['fraternityInfo']["FIJI"]['rating'] = rating
+    db.save(doc)
 
 @app.route("/needsDiscussion")
 def needsDiscussion():
   #need rushee's username
-  None
+  inp = ""
+  rusheeQuery = {'selector': {'$and': [{'type': 'rushee'}, {'$or': [{'email': inp}, {'username': inp}]}]}}
+  res = db.find(rusheeQuery)
+  for row in res:
+    doc = db.get(row.id)
+    doc['fraternityInfo']["FIJI"]['needsDiscussion'] = not doc['fraternityInfo']["FIJI"]['needsDiscussion']
+    db.save(doc)
 
 @app.route("/addComment")
 def addComment():
   #need rushee's username, comment, username of brther who left comment
-  None
+  inp = ""
+  comment = ""
+  rusheeQuery = {'selector': {'$and': [{'type': 'rushee'}, {'$or': [{'email': inp}, {'username': inp}]}]}}
+  res = db.find(rusheeQuery)
+  for row in res:
+    doc = db.get(row.id)
+    doc['fraternityInfo']["FIJI"]['comments'].append(comment)
+    db.save(doc)
 
 @app.route("/getInterestedIn")
 def getInterestedIn():
   #returns all rushees a frat is interested in
+  findRushees = {'selector': {'$and': [{'type': 'rushee'}, {'fraternityInfo': {"FIJI": {'interested':True}}}]}}
+  res = db.find(findRushees)
+  for doc in res:
+    print(doc)
+  return "All rushees FIJI is interested in"
+
+@app.route("/changeRusheeInterest")
+def changeRusheeInterest():
   None
 
 @app.route("/getRusheesInterestedIn")
