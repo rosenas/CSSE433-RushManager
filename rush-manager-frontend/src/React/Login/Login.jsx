@@ -14,6 +14,18 @@ function Login({ setToken, setAccountType }) {
 
         //check to verify login
 
+        
+        fetch("http://localhost:8000/login", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+        .then((response) => response.json())
+        .then((data) => {
+            
+        })
+
         if (username == "b") {
             setToken("valid")
             setAccountType("Brother")
@@ -29,6 +41,7 @@ function Login({ setToken, setAccountType }) {
 
     const handleCreateAccount = () => {
         setModal(true)
+
     }
 
     const handleClose = () => {
@@ -37,6 +50,17 @@ function Login({ setToken, setAccountType }) {
 
     const handleSubmitCreateAccount = () => {
         setModal(false)
+        
+        fetch("http://localhost:8000/createAccount", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+        .then((response) => response.json())
+        .then((data) => {
+            
+        })
     }
 
     const [modal, setModal] = useState(false)

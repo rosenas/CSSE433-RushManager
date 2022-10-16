@@ -78,3 +78,25 @@ table, th, td{
     background-color:grey;
     border: 1px solid;
 }
+
+
+.Navigation {
+    display: flex;
+    justify-content: space-between;
+}
+
+.LogOut_Button {
+    margin: 5px;
+}
+
+.search_button {
+    margin: 7px;
+}
+
+.search_bar {
+    margin:  7px 0px;
+}
+
+.add_button {
+    margin-bottom: 30px;
+}
