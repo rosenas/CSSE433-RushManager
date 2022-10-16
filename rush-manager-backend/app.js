@@ -90,6 +90,31 @@ app.post("/addEvent", (req, res) => {
 
 })
 
+
+app.post("/createAccount", (req, res) => {
+  
+})
+
+app.post("/login", (req, res) => {
+  
+})
+
+app.post("/comment", (req, res) => {
+  
+})
+
+app.post("/like", (req, res) => {
+  
+})
+
+app.post("/rsvp", (req, res) => {
+  
+})
+
+app.get("/contactInfo", (req, res) => {
+  
+})
+
 let rushees = [
   {
     "name": "Ari Rosen",

@@ -95,7 +95,7 @@ function ViewRushees(){
         </div>
         
         <div className= "add">
-            <Button variant="light" onClick={handleAddRushee}>Add Rushee</Button>
+            <Button variant="light" className="add_button"onClick={handleAddRushee}>Add Rushee</Button>
         </div>
         <AddRushEvent_Rushee/>
         </>

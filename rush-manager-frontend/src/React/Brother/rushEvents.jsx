@@ -173,7 +173,7 @@ function RushEvent(props){
                                         <tr>
                                             <td>{rushee.name}</td>
                                             <td>{rushee.likes}</td>
-                                            <td><Button>More Info</Button></td>
+                                            <td><Button>See More</Button></td>
                                         </tr>
                                     )
 
@@ -195,7 +195,7 @@ function RushEvent(props){
                 <Card.Text>
                     {props.event.date}
                 </Card.Text>
-                <Button onClick={handleMoreInfo} variant="outline-info">More Info</Button>
+                <Button className="add_button" onClick={handleMoreInfo} variant="outline-info">More Info</Button>
             </Card.Body>
             <MoreInfo_Modal/>
         </Card>
