@@ -53,14 +53,16 @@ app.get("/getRushees", async (req, res) => {
 
 app.get("/getEvents", async (req, res) => {
   res.send(events)
-  request('http://localhost:5000/getEvents', {
+  request('http://localhost:5000/', {
     json: true
   }, (err, res, body) => {
     if (err) {
+      console.log("ERROR")
       return console.log(err);
     }
     
     console.log(body);
+    res.send(events)
   });
 })
 

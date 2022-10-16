@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=C:\Users\rosenas\Documents\CSSE433-RushManager\rush-manager-python-backend\rush-manager-python-backend
+set VIRTUAL_ENV=C:/Users/grant/Documents/CSSE 433/Rush Manager/CSSE433-RushManager/rush-manager-python-backend/rush-manager-python-backend/
 
 if not defined PROMPT set PROMPT=$P$G
 

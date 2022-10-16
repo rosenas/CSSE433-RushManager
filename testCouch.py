@@ -1,14 +1,16 @@
-from ctypes import sizeof
+
 import couchdb
 #couch = couchdb.Server()
+###local
 #couch = couchdb.Server('http://testUser:password@localhost:5984/')
 #db = couch['testdb'] # existing
 
+###VM
 couch = couchdb.Server('http://admin:couch@137.112.104.178:5984/')
-#db = couch["example"]
-#db = couch.create('python-tests')
-db = None
-print(couch['example'])
+db = couch['testdb']
+#db = couch.create('testdb')
+#db = None
+#print(couch['example'])
 
 
 
@@ -23,6 +25,7 @@ def main():
             first = str(input("First: "))
             last = str(input("Last: "))
             username = str(input("Username: "))
+            #add unique username checks
             phone = str(input("Phone: "))
             email = str(input("Email: "))
             major = str(input("Major: "))
@@ -49,7 +52,7 @@ def main():
             phone = str(input("Phone: "))
             email = str(input("Email: "))
             major = str(input("Major: "))
-            reshall = str(input("Residence Hall:" ))
+            reshall = str(input("Residence Hall: " ))
 
             doc = {
                 'type': 'rushee',
@@ -66,7 +69,7 @@ def main():
                     'FIJI':
                     {
                     'frat': 'FIJI', 
-                    'bidStatus': 'none',
+                    'bidStatus': False,
                     'rating': 'none',
                     'comments': [],
                     'interested': False,
@@ -75,7 +78,7 @@ def main():
                     'SIGNU':
                     {
                     'frat': 'SIGNU', 
-                    'bidStatus': 'none',
+                    'bidStatus': False,
                     'rating': 'none',
                     'comments': [],
                     'interested': False,
@@ -84,7 +87,7 @@ def main():
                     'ATO':
                     {
                     'frat': 'ATO', 
-                    'bidStatus': 'none',
+                    'bidStatus': False,
                     'rating': 'none',
                     'comments': [],
                     'interested': False,
@@ -145,6 +148,59 @@ def main():
                 #res = db.find(findRushee)
                 #for row in res:
                     #print(row['fraternityInfo'])
+
+        elif(inp == "bid"):
+            frat = str(input("Frat: "))
+            rushee = str(input("Rushee: "))
+            rusheeQuery = {'selector': {'$and': [{'type': 'rushee'}, {'$or': [{'email': rushee}, {'username': rushee}]}]}}
+            res = db.find(rusheeQuery)
+            for row in res:
+                doc = db.get(row.id)
+                doc['fraternityInfo'][frat]['bidStatus'] = not doc['fraternityInfo'][frat]['bidStatus']
+                db.save(doc)
+
+        elif(inp == "rating"):
+            frat = str(input("Frat: "))
+            rushee = str(input("Rushee: "))
+            rating = str(input("Rating: "))
+            rusheeQuery = {'selector': {'$and': [{'type': 'rushee'}, {'$or': [{'email': rushee}, {'username': rushee}]}]}}
+            res = db.find(rusheeQuery)
+            for row in res:
+                doc = db.get(row.id)
+                doc['fraternityInfo'][frat]['rating'] = rating
+                db.save(doc)
+
+        elif(inp == "disc"):
+            frat = str(input("Frat: "))
+            rushee = str(input("Rushee: "))
+            disc = str(input("Needs Discussion (Yes/ No): ")).lower()
+            rusheeQuery = {'selector': {'$and': [{'type': 'rushee'}, {'$or': [{'email': rushee}, {'username': rushee}]}]}}
+            res = db.find(rusheeQuery)
+            for row in res:
+                doc = db.get(row.id)
+                doc['fraternityInfo'][frat]['needsDiscussion'] = disc
+                db.save(doc)
+
+        elif(inp == "remInt"):
+            frat = str(input("Frat: "))
+            rushee = str(input("Rushee: "))
+            rusheeQuery = {'selector': {'$and': [{'type': 'rushee'}, {'$or': [{'email': rushee}, {'username': rushee}]}]}}
+            res = db.find(rusheeQuery)
+            for row in res:
+                doc = db.get(row.id)
+                doc['fraternityInfo'][frat]['interested'] = False
+                db.save(doc)
+
+        elif(inp == "comment"):
+            frat = str(input("Frat: "))
+            rushee = str(input("Rushee: "))
+            comment = str(input("Comment: "))
+            rusheeQuery = {'selector': {'$and': [{'type': 'rushee'}, {'$or': [{'email': rushee}, {'username': rushee}]}]}}
+            res = db.find(rusheeQuery)
+            for row in res:
+                doc = db.get(row.id)
+                doc['fraternityInfo'][frat]['comments'].append(comment)
+                db.save(doc)
         
         #get all rushees a frat is interested in
         elif(inp == "intIn"):
