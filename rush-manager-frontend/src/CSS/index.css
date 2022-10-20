@@ -100,3 +100,14 @@ table, th, td{
 .add_button {
     margin-bottom: 30px;
 }
+
+.rushee_tables {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    
+}
+
+.table-name {
+    text-align: center;
+}

@@ -1,12 +1,20 @@
-from urllib import request
+from flask import request
 from flask import Flask
 app = Flask(__name__)
 import couchdb
 couch = couchdb.Server('http://admin:couch@137.112.104.178:5984/')
 db = couch['testdb']
 
+
+def queue(action):
+  with open("queue.txt", "w") as f:
+    f.write(action)
+    f.write("\n")
+
+
 @app.route("/")
 def hello():
+  queue("Connected")
   return "Connected to python!"
 
 
@@ -15,13 +23,18 @@ def getRushees():
   type = "rushee"
   getQuery = {'selector': {'type': type}}          
   res = db.find(getQuery)
+  data = []
   for doc in res:
+    #TODO need to put data into a dict/object
     print(doc)
+    data.append(doc)
+  #print(res)
   #return res
-  return "Getting the rushees"
+  #return "Getting the rushees"
+  return data
 
 @app.route("/getBrothers")
-def getRushees():
+def getBrothers():
   type = "brother"
   frat = "FIJI"
   getQuery = {'selector': {'$and': [{'type': type}, {'fraternity': frat}]}}        
@@ -29,7 +42,7 @@ def getRushees():
   for doc in res:
     print(doc)
   #return res
-  return "Getting brothers"
+  return res
 
 @app.route("/addBrother")
 def addBrother():
@@ -197,11 +210,12 @@ def getRusheesInterestedIn():
 def getEvents():
   return "Getting the events"
 
-#TODO need to figure out how to do post request 
 @app.route("/addEvent", methods = ['POST'])
 def addEvent():
+  
   if request.method == 'POST':
-    data = request.form
+    data = request.get_json()
+    queue("adding event, " + data['test'])
     print(data["test"]) 
     return "Adding an event"
 

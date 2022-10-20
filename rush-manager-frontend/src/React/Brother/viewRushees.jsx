@@ -130,6 +130,8 @@ function RusheeCard(props){
 
   const [commentModal, setCommentModal] = useState(false)
 
+  const [viewComments, setViewComments] = useState(false)
+
   const [like, setLike]= useState(false)
 
   const handleLike = () => {
@@ -138,6 +140,14 @@ function RusheeCard(props){
 
   const handleDislike = () => {
     setLike(false)
+  }
+
+  const handleViewComments = () => {
+    setViewComments(true)
+  }
+
+  const handleCloseComments = () => {
+    setViewComments(false)
   }
 
   const Like_Button = () => {
@@ -173,6 +183,66 @@ function RusheeCard(props){
     )
   }
 
+  const ViewAComment_Modal = () => {
+    return(
+      <Modal show={viewComments} onHide={handleCloseComments}>
+        <Modal.Header closeButton/>
+        <Modal.Title className="Modal-Title">
+          {props.rushee.name}
+        </Modal.Title>
+        <Modal.Body>
+          <div className="rushee_tables">
+            <div>
+              <h3 className="table-name">Comments</h3>
+              <div className="Modal-Table">
+                <table>
+                  <tbody>
+                    <tr>
+                      <th>Brother</th>
+                      <th>Comment</th>
+                    </tr>
+                    {props.rushee.comments && props.rushee.comments.map((comment) => {
+                      return (
+                        <tr>
+                          <td>{comment.user}</td>
+                          <td>{comment.comment}</td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div>
+              <h3 className="table-name">Events Attended</h3>
+              <div className="Modal-Table">
+                <table>
+                  <tbody>
+                    <tr>
+                      <th>Date</th>
+                      <th>Event</th>
+                    </tr>
+                    {props.rushee.events && props.rushee.events.map((event) => {
+                      return (
+                        <tr>
+                          <td>{event.date}</td>
+                          <td>{event.name}</td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+                    
+            </div>
+        
+            
+          </div>
+        </Modal.Body>
+      </Modal>
+    )
+  }
+
   
 
   return (
@@ -181,7 +251,9 @@ function RusheeCard(props){
       <Card.Body>
         <Card.Title>{props.rushee.name}</Card.Title>
         <Card.Text>
-            {props.rushee.info}
+            {//TODO make this a drop down
+            props.rushee.info
+            }
         </Card.Text>
         <Card.Text>
           Likes: {props.rushee.likes}
@@ -189,9 +261,11 @@ function RusheeCard(props){
         <div className="Rushee-Buttons">
           <Button variant="outline-dark " onClick={handleAddAComment}>Comment</Button>
           <Like_Button/>
+          <Button variant="outline-dark" onClick={handleViewComments}>More Info</Button>
         </div>
       </Card.Body>
       <LeaveAComment_Modal/>
+      <ViewAComment_Modal/>
     </Card>
    
   );

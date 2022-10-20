@@ -39,7 +39,7 @@ app.get('/', (req, res) => {
 
 //TODO make this a post and check for verification
 app.get("/getRushees", async (req, res) => {
-  res.send(rushees)
+
   request('http://localhost:5000/getRushees', {
     json: true
   }, (err, res, body) => {
@@ -48,7 +48,9 @@ app.get("/getRushees", async (req, res) => {
     }
     
     console.log(body);
+    
   });
+  res.send(rushees)
 })
 
 app.get("/getEvents", async (req, res) => {
@@ -128,6 +130,12 @@ let rushees = [
       {
         "user": "user2",
         "comment": "He's one of them ones"
+      }
+    ], 
+    'events': [
+      {
+        "name": "Monday Night Football",
+        "date": "9/27"
       }
     ]
       

@@ -166,14 +166,13 @@ function RushEvent(props){
                             <tr>
                                 <th>Rushee Name</th>
                                 <th>Likes</th>
-                                <th>More info</th>
                             </tr>
                                 {props.event.attending && props.event.attending.map((rushee) => {
                                     return (
                                         <tr>
                                             <td>{rushee.name}</td>
                                             <td>{rushee.likes}</td>
-                                            <td><Button>See More</Button></td>
+                                            
                                         </tr>
                                     )
 
