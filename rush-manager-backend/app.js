@@ -38,16 +38,17 @@ app.get('/', (req, res) => {
 })
 
 //TODO make this a post and check for verification
-app.get("/getRushees", async (req, res) => {
-
+app.get("/getRushees", async (req, res1) => {
+  
   request('http://localhost:5000/getRushees', {
     json: true
   }, (err, res, body) => {
     if (err) {
       return console.log(err);
     }
-    
+    console.log("res:")
     console.log(body);
+    res1.send(body)
     
   });
   res.send(rushees)

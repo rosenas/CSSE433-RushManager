@@ -249,14 +249,14 @@ function RusheeCard(props){
     <Card style={{ width: '12rem' }}>
       <Card.Img variant="top" src="holder.js/100px180" alt="Rushee Picture Here"/>
       <Card.Body>
-        <Card.Title>{props.rushee.name}</Card.Title>
+        <Card.Title>{props.rushee.first}</Card.Title>
         <Card.Text>
             {//TODO make this a drop down
-            props.rushee.info
+            props.rushee.last
             }
         </Card.Text>
         <Card.Text>
-          Likes: {props.rushee.likes}
+          Likes: {props.rushee.email}
         </Card.Text>
         <div className="Rushee-Buttons">
           <Button variant="outline-dark " onClick={handleAddAComment}>Comment</Button>
