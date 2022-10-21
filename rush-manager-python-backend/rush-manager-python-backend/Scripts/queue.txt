@@ -26,3 +26,23 @@ DONE%&%addRushee%&%{"type": "rushee", "first": "h", "last": "h", "email": "h", "
 DONE%&%addRushee%&%{"type": "rushee", "first": "k", "last": "k", "email": "k", "major": "k", "reshall": "k", "interests": [], "fraternitiesInterestedIn": [], "username": "k", "phone": "k", "fraternityInfo": {"FIJI": {"frat": "FIJI", "bidStatus": false, "rating": "none", "comments": [], "interested": false, "needsDiscussion": false}}}TODO%&%addRushee%&%{"type": "rushee", "first": "l", "last": "l", "email": "l", "major": "l", "reshall": "l", "interests": [], "fraternitiesInterestedIn": [], "username": "l", "phone": "l", "fraternityInfo": {"FIJI": {"frat": "FIJI", "bidStatus": false, "rating": "none", "comments": [], "interested": false, "needsDiscussion": false}}}
 DONE%&%deleteRushee%&%k
 DONE%&%addRushee%&%{"type": "rushee", "first": "b", "last": "b", "email": "b", "major": "b", "reshall": "b", "interests": [], "fraternitiesInterestedIn": [], "username": "b", "phone": "b", "fraternityInfo": {"FIJI": {"frat": "FIJI", "bidStatus": false, "rating": "none", "comments": [], "interested": false, "needsDiscussion": false}}}
+DONE%&%addRushee%&%{"type": "rushee", "first": "l", "last": "l", "email": "l", "major": "l", "housing": "", "interests": [], "interestedInFIJI": false, "username": "l", "phone": "l", "fraternityInfo": {"FIJI": {"frat": "FIJI", "bidStatus": false, "rating": "none", "comments": [], "interested": false, "needsDiscussion": false}}}
+DONE%&%deleteRushee%&%l
+DONE%&%deleteRushee%&%b
+DONE%&%addUser%&%{"type": "user", "first": "s", "last": "s", "email": "s", "major": "s", "housing": "", "interests": [], "interestedInFIJI": false, "username": "s", "phone": "s", "fraternityInfo": {"FIJI": {"frat": "FIJI", "bidStatus": false, "rating": "none", "comments": [], "interested": false, "needsDiscussion": false}}}
+DONE%&%changeUserType%&%rushee%&%s
+DONE%&%addUser%&%{"type": "user", "first": "x", "last": "x", "email": "x", "major": "x", "housing": "", "interests": [], "interestedInFIJI": false, "username": "x", "phone": "x", "fraternityInfo": {"FIJI": {"frat": "FIJI", "bidStatus": false, "rating": "none", "comments": [], "interested": false, "needsDiscussion": false}}}
+DONE%&%changeUserType%&%rushee%&%x
+DONE%&%addUser%&%{"type": "user", "first": "f", "last": "f", "email": "f", "major": "f", "housing": "", "interests": [], "interestedInFIJI": false, "username": "f", "phone": "f", "fraternityInfo": {"FIJI": {"frat": "FIJI", "bidStatus": false, "rating": "none", "comments": [], "interested": false, "needsDiscussion": false}}}
+DONE%&%changeUserType%&%rushee%&%f
+DONE%&%addUser%&%{"type": "user", "first": "c", "last": "c", "email": "c", "major": "c", "housing": "", "interests": [], "interestedInFIJI": false, "username": "c", "phone": "c", "fraternityInfo": {"FIJI": {"frat": "FIJI", "bidStatus": false, "rating": "none", "comments": [], "interested": false, "needsDiscussion": false}}}
+DONE%&%changeUserType%&%rushee%&%c
+DONE%&%addUser%&%{"type": "user", "first": "m", "last": "m", "email": "m", "major": "m", "housing": "", "interests": [], "interestedInFIJI": false, "username": "m", "phone": "m", "fraternityInfo": {"FIJI": {"frat": "FIJI", "bidStatus": false, "rating": "none", "comments": [], "interested": false, "needsDiscussion": false}}}
+DONE%&%changeUserType%&%rushee%&%m
+DONE%&%addUser%&%{"type": "user", "first": "y", "last": "y", "email": "y", "major": "y", "housing": "", "interests": [], "interestedInFIJI": false, "username": "y", "phone": "y", "fraternityInfo": {"FIJI": {"frat": "FIJI", "bidStatus": false, "rating": "none", "comments": [], "interested": false, "needsDiscussion": false}}}
+DONE%&%changeUserType%&%rushee%&%y
+DONE%&%addUser%&%{"type": "rushee", "first": "j", "last": "j", "email": "j", "major": "j", "housing": "", "interests": [], "interestedInFIJI": false, "username": "j", "phone": "j", "fraternityInfo": {"FIJI": {"frat": "FIJI", "bidStatus": false, "rating": "none", "comments": [], "interested": true, "needsDiscussion": false}}}
+DONE%&%addUser%&%{"type": "rushee", "first": "b", "last": "b", "email": "b", "major": "b", "housing": "", "interests": [], "interestedInFIJI": false, "username": "b", "phone": "b", "fraternityInfo": {"FIJI": {"frat": "FIJI", "bidStatus": false, "rating": "none", "comments": [], "interested": true, "needsDiscussion": false}}}
+DONE%&%deleteRushee%&%b
+DONE%&%deleteRushee%&%j
+DONE%&%deleteRushee%&%y

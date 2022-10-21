@@ -28,8 +28,8 @@ def readQueue():
     for line in data:
       split = line.split("%&%")
       if(split[0] == "TODO"):
-        if(split[1] == "addRushee"):
-          res = couchAddRushee(json.loads(split[2]))
+        if(split[1] == "addUser"):
+          res = couchAddUser(json.loads(split[2]))
           if res:
             line = "DONE%&%" + split[1] + "%&%" + split[2] 
             newFile.append(line)
@@ -42,6 +42,15 @@ def readQueue():
             newFile.append(line)
           else:
             newFile.append(line)
+        elif(split[1] == "changeUserType"):
+          print(split)
+          res = couchChangeUserType(split[3].strip(), split[2].strip())
+          if res:
+            line = "DONE%&%" + split[1] + "%&%" + split[2] + "%&%" + split[3] 
+            newFile.append(line)
+          else:
+            newFile.append(line)
+
       else: #already done
         newFile.append(line)
         None
@@ -58,6 +67,19 @@ def hello():
   #queue("Connected")
   return "Connected to python!"
 
+@app.route("/createUser", methods = ['POST'])
+def createUser():
+  #from a rush chairs "add rushee button"
+  data = ""
+  print("CREATE USER")
+  if request.method == 'POST':
+    data = request.get_json().get('body')
+  if(data.get('accountType' == "brother")):
+    addUser(data, "requestedBrother")
+  if(data.get('accountType' == "rushee")):
+    addUser(data, "requestedRushee")
+  return []
+  
 
 @app.route("/getRushees")
 def getRushees():
@@ -71,23 +93,16 @@ def getRushees():
     data.append(doc)
   return data
 
-
-
-@app.route("/addRushee", methods = ['POST'])
-def addRushee():
-  data = ""
-  print("ADDING RUSHEE")
-  if request.method == 'POST':
-    data = request.get_json().get('body')
+def addUser(data, type):
   doc = {
-    "type": "rushee",
+    "type": type,
     "first": data.get('first'),
     "last": data.get('last'),
     "email": data.get('email'),
     "major": data.get('major'),
-    "reshall": data.get('reshall'),
+    "housing": data.get('housing'),
     "interests": [],
-    "fraternitiesInterestedIn": [],
+    "interestedInFIJI": False,
     "username": data.get('username'),
     "phone": data.get('phone'),
     "fraternityInfo": {
@@ -97,16 +112,39 @@ def addRushee():
         "bidStatus": False,
         "rating": 'none',
         "comments": [],
-        "interested": False,
+        "interested": True,
         "needsDiscussion": False
       }
     }
   }
-  queue("TODO%&%" + "addRushee%&%" + json.dumps(doc))
+  queue("TODO%&%" + "addUser%&%" + json.dumps(doc))
+  return True
+
+@app.route("/addRushee", methods = ['POST'])
+def addRushee():
+  #from a rush chairs "add rushee button"
+  data = ""
+  print("ADDING RUSHEE")
+  if request.method == 'POST':
+    data = request.get_json().get('body')
+  addUser(data, "rushee")
+  #queue("TODO%&%changeUserType%&%rushee%&%" + data.get('username'))
+  
   
   return "Rushee added"
 
-def couchAddRushee(doc):
+def couchChangeUserType(username, type):
+  if not db:
+    return False
+  userQuery = {'selector': {'username': username}}
+  res = db.find(userQuery)
+  for doc in res:
+    doc["type"] = type
+    db.save(doc)
+  return True
+
+
+def couchAddUser(doc):
   if not db:
     return False
   res = db.save(doc)
@@ -149,20 +187,15 @@ def getBrothers():
   #return res
   return res
 
-@app.route("/addBrother")
+@app.route("/addBrother", methods = ['POST'])
 def addBrother():
-  # doc = {
-  #   'type': 'brother',
-  #   'first': first,
-  #   'last': last,
-  #   'email': email,
-  #   'major': major,
-  #   'username': username,
-  #   'phone': phone,
-  #   'interests': [],
-  #   'fraternity': fraternity
-  # }
-  # db.save(doc)
+  #from admin's add brother button
+  data = ""
+  print("ADDING BROTHER")
+  if request.method == 'POST':
+    data = request.get_json().get('body')
+  addUser(data, "brother")
+  #queue("TODO%&%changeUserType%&%brother%&%" + data.get('username'))
   return "Brother added"
 
 @app.route("/deleteBrother")

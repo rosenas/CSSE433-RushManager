@@ -34,6 +34,18 @@ function Login({ setToken, setAccountType }) {
             setToken("valid")
             setAccountType("Rushee")
         }
+        else if (username == "a") {
+            setToken("valid")
+            setAccountType("Admin")
+        }
+        else if (username == "reqB") {
+            setToken("valid")
+            setAccountType("ReqB")
+        }
+        else if (username == "ReqR") {
+            setToken("valid")
+            setAccountType("ReqR")
+        }
 
 
 
@@ -64,7 +76,38 @@ function Login({ setToken, setAccountType }) {
     }
 
     const [modal, setModal] = useState(false)
+    
+    var doc = {'first': "",
+            'accountType': "",
+          'last': "",
+          'username': "",
+          'email': "",
+          'major': "",
+          'phone': "",
+          'housing': ""};
 
+
+    const handleSubmitCreateUser = () => {
+            console.log(doc)
+            fetch("http://localhost:8000/createUser", {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify(doc)
+              })
+              .then(respnse =>{
+                      console.log(respnse)
+                     
+                      //close the modal
+                      setModal(false)
+                    //handleClose()
+                  }
+              )
+      
+      
+          }
+    
     const CreateAccount_Modal = () => {
         return (
             <Modal show={modal} onHide={handleClose}>
@@ -74,31 +117,31 @@ function Login({ setToken, setAccountType }) {
                     <div>
                         <div className='Modal-Input'>
                             <label for="Username"><b>Username</b></label>
-                            <input type="text" placeholder="Username" name="Username"/>
+                            <input type="text" placeholder="Username" name="Username" onChange={e => doc.username = e.target.value} />
 
                             <label for="Password"><b>Password</b></label>
-                            <input type="password" placeholder="Password" name="Password"/>
+                            <input type="password" placeholder="Password" name="Password"required />
                             <label for="AccountType"><b>Account Type</b></label>
-                            <input type="text" placeholder="Account Type" name="AccountType"/>
+                            <input type="text" placeholder="Account Type" name="AccountType" onChange={e => doc.accountType = e.target.value} />
                             <label for="First"><b>First Name</b></label>
-                            <input type="text" placeholder="First" name="first"/>
+                            <input type="text" placeholder="First" name="first" onChange={e => doc.first = e.target.value} />
                             <label for="Last"><b>Last Name</b></label>
-                            <input type="text" placeholder="Last" name="Last"/>
+                            <input type="text" placeholder="Last" name="Last" onChange={e => doc.last = e.target.value} />
                             <label for="Email"><b>Email</b></label>
-                            <input type="text" placeholder="Email" name="Email"/>
+                            <input type="text" placeholder="Email" name="Email" onChange={e => doc.email = e.target.value} />
                             <label for="Phone"><b>Phone Number</b></label>
-                            <input type="text" placeholder="Phone" name="Phone"/>
+                            <input type="text" placeholder="Phone" name="Phone" onChange={e => doc.phone = e.target.value} />
                             <label for="Major"><b>Major</b></label>
-                            <input type="text" placeholder="Major" name="Major"/>
+                            <input type="text" placeholder="Major" name="Major" onChange={e => doc.major = e.target.value} />
                             <label for="housing"><b>Housing Location</b></label>
-                            <input type="text" placeholder="Housing Location" name="housing"/>
+                            <input type="text" placeholder="Housing Location" name="housing" onChange={e => doc.housing = e.target.value} />
                             
 
                         </div>
                     </div>
                     <div className="Modal-Buttons">
                         <Button variant="secondary" onClick={handleClose}>Cancel</Button>
-                        <Button variant="primary" onClick={handleSubmitCreateAccount}>Create Account</Button>
+                        <Button variant="primary" onClick={handleSubmitCreateUser}>Create Account</Button>
                     </div>
                 </Modal.Body>
 

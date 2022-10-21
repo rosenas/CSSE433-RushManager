@@ -111,6 +111,21 @@ app.post("/addRushee", (req, res1) => {
 
 })
 
+app.post("/createUser", (req, res1) => {
+  console.log(req.body.first)
+  request.post('http://127.0.0.1:5000/createUser', {
+    json: true,
+    body: req
+  }, (err, res, body) => {
+    if (err) {
+      return console.log(err);
+    }
+    res1.send("Added")
+    //console.log(body);
+  });
+
+})
+
 app.post("/deleteRushee", (req, res1) => {
   console.log(req.body.first)
   request.post('http://127.0.0.1:5000/deleteRushee', {

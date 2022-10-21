@@ -5,9 +5,9 @@ import Card from 'react-bootstrap/Card';
 import Modal from 'react-bootstrap/Modal'
 import "../../CSS/index.css"
 
-function ViewRushees(){
+function ViewRushees(props){
 
-
+  console.log(props)
     const [rushees, setRushees] = useState([])
 
 
@@ -21,7 +21,8 @@ function ViewRushees(){
           'email': "",
           'major': "",
           'phone': "",
-          'reshall': ""};
+          'housing': ""};
+
     const handleAddRushee = () => {
       setModal(true)
     }
@@ -90,13 +91,15 @@ function ViewRushees(){
 
     const AddRushEvent_Rushee=  () => {
       return(
+        
           <Modal show={modal} onHide={handleClose}>
               <Modal.Header closeButton />
               <Modal.Title className="Modal-Title">
-                  Add a Rush Event
+                  Add a Rushee
               </Modal.Title>
               <Modal.Body>
                   <div>
+                    
                       <div className="Modal-Input">
                           <label for="Event"><b>First Name</b></label>
                           <input type="text" placeholder="Enter Rushee Name" name="Rushee Name" onChange={e => doc.first = e.target.value} required />
@@ -125,7 +128,7 @@ function ViewRushees(){
               </Modal.Body>
 
           </Modal>
-
+      
       )
     
   } 
@@ -136,12 +139,15 @@ function ViewRushees(){
         <>
         <h1 className="title">Rushees</h1>
         <div className="container">
-            {rushees && rushees.map((rushee) => <RusheeCard rushee={rushee} getRushees = {getRushees}/>)}
+            {rushees && rushees.map((rushee) => <RusheeCard rushee={rushee} getRushees = {getRushees} accountType = {props.accountType}/>)}
         </div>
         
+        {
+          props.accountType === "admin" &&
         <div className= "add">
             <Button variant="light" className="add_button"onClick={handleAddRushee}>Add Rushee</Button>
         </div>
+        }
         <AddRushEvent_Rushee/>
         </>
     )
@@ -329,12 +335,6 @@ function RusheeCard(props){
             {//TODO make this a drop down
             props.rushee.major}
         </Card.Text>
-        {/* <Card.Text>
-          {props.rushee.email}
-        </Card.Text>
-        <Card.Text>
-          {props.rushee.phone}
-        </Card.Text> */}
         <Card.Text>
           {props.rushee.reshall}
         </Card.Text>
@@ -345,7 +345,9 @@ function RusheeCard(props){
           <Button variant="outline-dark " onClick={handleAddAComment}>Comment</Button>
           <Like_Button/>
           <Button variant="outline-dark" onClick={handleViewComments}>More Info</Button>
+          {props.accountType === "admin" &&
           <Button variant="outline-dark" onClick={deleteRushee}>Delete Rushee</Button>
+      }
         </div>
       </Card.Body>
       <LeaveAComment_Modal/>

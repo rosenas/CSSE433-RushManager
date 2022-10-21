@@ -38,7 +38,7 @@ function LoggedInRouter({accountType, setToken }){
         setToken("invalid")
     }
 
-    if (accountType == "Brother"){
+    if (accountType == "Admin"){
 
         
         
@@ -49,11 +49,11 @@ function LoggedInRouter({accountType, setToken }){
                     <Button className="LogOut_Button" onClick={handleLogOut}>Log out</Button>
                 </div>
                  <Routes>
-                    <Route path="/rushEvents" element={<RushEvents_Brother/>}/>
+                    <Route path="/rushEvents" element={<RushEvents_Brother accountType = "admin"/>}/>
 
-                    <Route path="/viewRushees" element={<ViewRushees/>}/>
+                    <Route path="/viewRushees" element={<ViewRushees accountType = {"admin"}/>}/>
 
-                    <Route path= "*" element={<ViewRushees/>}/>
+                    <Route path= "*" element={<ViewRushees accountType = {"admin"}/>}/>
                 </Routes>
             </Router>
            
@@ -74,6 +74,27 @@ function LoggedInRouter({accountType, setToken }){
                     <Route path= "*" element={<RushEvents/>}/>
                 </Routes>
             </Router>
+        )
+    }
+    else if (accountType == "Brother"){
+
+        
+        
+        return (
+            <Router>
+                <div className="Navigation">
+                    <Navigation_Brother/>
+                    <Button className="LogOut_Button" onClick={handleLogOut}>Log out</Button>
+                </div>
+                 <Routes>
+                    <Route path="/rushEvents" element={<RushEvents_Brother accountType = "brother"/>}/>
+
+                    <Route path="/viewRushees" element={<ViewRushees accountType = {"brother"}/>}/>
+
+                    <Route path= "*" element={<ViewRushees accountType = {"brother"}/>}/>
+                </Routes>
+            </Router>
+           
         )
     }
 
