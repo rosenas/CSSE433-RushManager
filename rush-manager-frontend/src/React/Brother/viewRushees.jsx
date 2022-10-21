@@ -5,8 +5,6 @@ import Card from 'react-bootstrap/Card';
 import Modal from 'react-bootstrap/Modal'
 import "../../CSS/index.css"
 
-
-
 function ViewRushees(){
 
 
@@ -44,6 +42,9 @@ function ViewRushees(){
     const handleCancel = () => {
       setModal(false);
     }
+
+    
+    
 
     const getRushees = () => {
       fetch('http://localhost:8000/getRushees',{

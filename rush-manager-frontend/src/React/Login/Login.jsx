@@ -78,6 +78,22 @@ function Login({ setToken, setAccountType }) {
 
                             <label for="Password"><b>Password</b></label>
                             <input type="password" placeholder="Password" name="Password"/>
+                            <label for="AccountType"><b>Account Type</b></label>
+                            <input type="text" placeholder="Account Type" name="AccountType"/>
+                            <label for="First"><b>First Name</b></label>
+                            <input type="text" placeholder="First" name="first"/>
+                            <label for="Last"><b>Last Name</b></label>
+                            <input type="text" placeholder="Last" name="Last"/>
+                            <label for="Email"><b>Email</b></label>
+                            <input type="text" placeholder="Email" name="Email"/>
+                            <label for="Phone"><b>Phone Number</b></label>
+                            <input type="text" placeholder="Phone" name="Phone"/>
+                            <label for="Major"><b>Major</b></label>
+                            <input type="text" placeholder="Major" name="Major"/>
+                            <label for="housing"><b>Housing Location</b></label>
+                            <input type="text" placeholder="Housing Location" name="housing"/>
+                            
+
                         </div>
                     </div>
                     <div className="Modal-Buttons">

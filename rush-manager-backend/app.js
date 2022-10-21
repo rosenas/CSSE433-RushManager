@@ -65,7 +65,7 @@ app.get("/getEvents", async (req, res) => {
     }
     
     console.log(body);
-    res.send(events)
+    //res.send(events)
   });
 })
 

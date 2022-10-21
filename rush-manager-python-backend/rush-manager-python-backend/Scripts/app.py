@@ -1,38 +1,142 @@
+from hashlib import new
 from flask import request
 from flask import Flask
+import time
+import json
 app = Flask(__name__)
 import couchdb
 couch = couchdb.Server('http://admin:couch@137.112.104.178:5984/')
-db = couch['testdb']
+try:
+  db = couch['testdb']
+except:
+  db = None
+  print("couch down")
 
 
 def queue(action):
-  with open("queue.txt", "w") as f:
+  with open("queue.txt", "a") as f:
     f.write(action)
     f.write("\n")
+    f.close()
+    readQueue()
+
+@app.route("/refreshDatabase")
+def readQueue():
+  newFile = []
+  with open("queue.txt", "r+") as f:
+    data = list(f)
+    for line in data:
+      split = line.split("%&%")
+      if(split[0] == "TODO"):
+        if(split[1] == "addRushee"):
+          res = couchAddRushee(json.loads(split[2]))
+          if res:
+            line = "DONE%&%" + split[1] + "%&%" + split[2] 
+            newFile.append(line)
+          else:
+            newFile.append(line)
+        elif(split[1] == "deleteRushee"):
+          res = couchDeleteRushee((split[2]).strip())
+          if res:
+            line = "DONE%&%" + split[1] + "%&%" + split[2] 
+            newFile.append(line)
+          else:
+            newFile.append(line)
+      else: #already done
+        newFile.append(line)
+        None
+      
+    f.close()
+  f = open("queue.txt", "wt")
+  f.truncate(0)
+  f.writelines(newFile)
+  return []
 
 
 @app.route("/")
 def hello():
-  queue("Connected")
+  #queue("Connected")
   return "Connected to python!"
 
 
 @app.route("/getRushees")
 def getRushees():
   print("GETTING RUSHEES")
+  readQueue()
   type = "rushee"
   getQuery = {'selector': {'type': type}}          
   res = db.find(getQuery)
   data = []
   for doc in res:
-    #TODO need to put data into a dict/object
-    print(doc)
     data.append(doc)
-  #print(res)
-  #return res
-  #return "Getting the rushees"
   return data
+
+
+
+@app.route("/addRushee", methods = ['POST'])
+def addRushee():
+  data = ""
+  print("ADDING RUSHEE")
+  if request.method == 'POST':
+    data = request.get_json().get('body')
+  doc = {
+    "type": "rushee",
+    "first": data.get('first'),
+    "last": data.get('last'),
+    "email": data.get('email'),
+    "major": data.get('major'),
+    "reshall": data.get('reshall'),
+    "interests": [],
+    "fraternitiesInterestedIn": [],
+    "username": data.get('username'),
+    "phone": data.get('phone'),
+    "fraternityInfo": {
+      "FIJI":
+      {
+        "frat": "FIJI", 
+        "bidStatus": False,
+        "rating": 'none',
+        "comments": [],
+        "interested": False,
+        "needsDiscussion": False
+      }
+    }
+  }
+  queue("TODO%&%" + "addRushee%&%" + json.dumps(doc))
+  
+  return "Rushee added"
+
+def couchAddRushee(doc):
+  if not db:
+    return False
+  res = db.save(doc)
+  #TODO 
+  #check what res returns if the save was unsuccessful
+  return True
+
+@app.route("/deleteRushee", methods = ['POST'])
+def deleteRushee():
+
+  data = ""
+  if request.method == 'POST':
+    data = request.get_json().get('body').get('query')
+  # searchInput = ""
+  queue("TODO%&%" + "deleteRushee%&%" + data)
+  
+  return "Rushee deleted"
+
+
+def couchDeleteRushee(data):
+  if not db:
+    return False
+  userQuery = {'selector': {'$and': [{'type': "rushee"}, {'$or': [{'email': data}, {'username': data}]}]}}
+  res = db.find(userQuery)
+  for doc in res:
+    db.delete(doc)
+  #TODO 
+  #check what res returns if the save was unsuccessful
+  return True
+  
 
 @app.route("/getBrothers")
 def getBrothers():
@@ -70,60 +174,6 @@ def deleteBrother():
     db.delete(doc)
   return "Brother deleted"
 
-
-#   @app.route("/addEvent", methods = ['POST'])
-# def addEvent():
-  
-#   if request.method == 'POST':
-#     data = request.get_json()
-#     queue("adding event, " + data['test'])
-#     print(data["test"]) 
-#     return "Adding an event"
-
-@app.route("/addRushee", methods = ['POST'])
-def addRushee():
-  data = ""
-  print("HERE")
-  if request.method == 'POST':
-    data = request.get_json().get('body')
-  doc = {
-    'type': 'rushee',
-    'first': data.get('first'),
-    'last': data.get('last'),
-    'email': data.get('email'),
-    'major': data.get('major'),
-    'reshall': data.get('reshall'),
-    'interests': [],
-    'fraternitiesInterestedIn': [],
-    'username': data.get('username'),
-    'phone': data.get('phone'),
-    'fraternityInfo': {
-      'FIJI':
-      {
-        'frat': 'FIJI', 
-        'bidStatus': False,
-        'rating': 'none',
-        'comments': [],
-        'interested': False,
-        'needsDiscussion': False
-      }
-    }
-  }
-  db.save(doc)
-  return "Rushee added"
-
-@app.route("/deleteRushee", methods = ['POST'])
-def deleteRushee():
-  data = ""
-  if request.method == 'POST':
-    data = request.get_json().get('body').get('query')
-  # searchInput = ""
-  userQuery = {'selector': {'$and': [{'type': "rushee"}, {'$or': [{'email': data}, {'username': data}]}]}}
-  res = db.find(userQuery)
-  for doc in res:
-    db.delete(doc)
-  return "Rushee deleted"
-
 @app.route("/searchBrother")
 def searchBrother():
   #need name, username, etc
@@ -149,6 +199,18 @@ def searchRushee():
   res = db.find(findBrother)
   for row in res:
     print(row['first'], row['last'], row['email'], row['username'])
+
+
+
+
+#   @app.route("/addEvent", methods = ['POST'])
+# def addEvent():
+  
+#   if request.method == 'POST':
+#     data = request.get_json()
+#     queue("adding event, " + data['test'])
+#     print(data["test"]) 
+#     return "Adding an event"
 
 @app.route("/changeFratInterest")
 def changeFratInterest():
