@@ -20,7 +20,7 @@ app.listen(port, () => {
 
 
   //how you call app.py
-  request('http://localhost:5000/', {
+  request('http://127.0.0.1:5000/', {
     json: true
   }, (err, res, body) => {
     if (err) {
@@ -38,22 +38,25 @@ app.get('/', (req, res) => {
 })
 
 //TODO make this a post and check for verification
-app.get("/getRushees", async (req, res) => {
-  res.send(rushees)
-  request('http://localhost:5000/getRushees', {
+app.get("/getRushees", async (req, res1) => {
+  console.log("get rushees")
+  request('http://127.0.0.1:5000/getRushees', {
     json: true
   }, (err, res, body) => {
     if (err) {
       return console.log(err);
     }
-    
+    console.log("res:")
     console.log(body);
+    res1.send(body)
+    
   });
+  //res.send(rushees)
 })
 
 app.get("/getEvents", async (req, res) => {
   res.send(events)
-  request('http://localhost:5000/', {
+  request('http://127.0.0.1:5000/', {
     json: true
   }, (err, res, body) => {
     if (err) {
@@ -77,7 +80,7 @@ app.post("/addEvent", (req, res) => {
 
   res.send({"status": "success"})
 
-  request.post('http://localhost:5000/addEvent', {
+  request.post('http://127.0.0.1:5000/addEvent', {
     json: true,
     body: {
       test : "test"
@@ -92,6 +95,36 @@ app.post("/addEvent", (req, res) => {
 
 })
 
+
+app.post("/addRushee", (req, res1) => {
+  console.log(req.body.first)
+  request.post('http://127.0.0.1:5000/addRushee', {
+    json: true,
+    body: req
+  }, (err, res, body) => {
+    if (err) {
+      return console.log(err);
+    }
+    res1.send("Added")
+    //console.log(body);
+  });
+
+})
+
+app.post("/deleteRushee", (req, res1) => {
+  console.log(req.body.first)
+  request.post('http://127.0.0.1:5000/deleteRushee', {
+    json: true,
+    body: req
+  }, (err, res, body) => {
+    if (err) {
+      return console.log(err);
+    }
+    res1.send("Deleted")
+    //console.log(body);
+  });
+
+})
 
 app.post("/createAccount", (req, res) => {
   
@@ -130,6 +163,12 @@ let rushees = [
       {
         "user": "user2",
         "comment": "He's one of them ones"
+      }
+    ], 
+    'events': [
+      {
+        "name": "Monday Night Football",
+        "date": "9/27"
       }
     ]
       

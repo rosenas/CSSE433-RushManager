@@ -19,6 +19,7 @@
   "homepage": "https://github.com/rosenas/CSSE433-RushManager#readme",
   "dependencies": {
     "cors": "^2.8.5",
+    "couchdb": "^0.3.8",
     "express": "^4.18.1",
     "node-fetch": "^3.2.10",
     "nodemon": "^2.0.20",

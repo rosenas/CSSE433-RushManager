@@ -9,15 +9,27 @@ import "../../CSS/index.css"
 
 function ViewRushees(){
 
+
+    const [rushees, setRushees] = useState([])
+
+
+  
+
     const [modal, setModal] = useState(false)
 
-    let rushee;
+    var doc = {'first': "",
+          'last': "",
+          'username': "",
+          'email': "",
+          'major': "",
+          'phone': "",
+          'reshall': ""};
     const handleAddRushee = () => {
       setModal(true)
     }
 
     const handleSetRusheeName = (name) => {
-      rushee = name
+      doc.first = name
     }
     let photo;
     const handleSetPhoto = (_photo) => {
@@ -33,11 +45,46 @@ function ViewRushees(){
       setModal(false);
     }
 
-    const handleSubmit = () => {
-      
+    const getRushees = () => {
+      fetch('http://localhost:8000/getRushees',{
+                  headers : { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                  }
+                })
+              .then(response=> response.json())
+              .then(data=>{
+                console.log("GETTING RUSHEES")
+                setRushees(data)
+                console.log(data)
+              })
     }
 
-    
+    const handleSubmit = () => {
+      console.log(doc)
+      fetch("http://localhost:8000/addRushee", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(doc)
+        })
+        .then(respnse =>{
+                console.log(respnse)
+               
+                //close the modal
+                getRushees()
+                
+              handleClose()
+            }
+        )
+
+
+    }
+
+    if(rushees.length == 0){
+      getRushees()
+  }
 
 
     const AddRushEvent_Rushee=  () => {
@@ -50,9 +97,20 @@ function ViewRushees(){
               <Modal.Body>
                   <div>
                       <div className="Modal-Input">
-                          <label for="Event"><b>Rushee Name</b></label>
-                          <input type="text" placeholder="Enter Rushee Name" name="Rushee Name" onChange={e => handleSetRusheeName(e.target.value)} required />
-
+                          <label for="Event"><b>First Name</b></label>
+                          <input type="text" placeholder="Enter Rushee Name" name="Rushee Name" onChange={e => doc.first = e.target.value} required />
+                          <label for="Event"><b>Last Name</b></label>
+                          <input type="text" placeholder="Enter Rushee Name" name="Rushee Name" onChange={e => doc.last = e.target.value} required />
+                          <label for="Event"><b>Username</b></label>
+                          <input type="text" placeholder="Enter Rushee Name" name="Rushee Name" onChange={e => doc.username = e.target.value} required />
+                          <label for="Event"><b>Email</b></label>
+                          <input type="text" placeholder="Enter Rushee Name" name="Rushee Name" onChange={e => doc.email = e.target.value} required />
+                          <label for="Event"><b>Phone Number</b></label>
+                          <input type="text" placeholder="Enter Rushee Name" name="Rushee Name" onChange={e => doc.phone = e.target.value} required />
+                          <label for="Event"><b>Major</b></label>
+                          <input type="text" placeholder="Enter Rushee Name" name="Rushee Name" onChange={e => doc.major = e.target.value} required />
+                          <label for="Event"><b>ResHall</b></label>
+                          <input type="text" placeholder="Enter Rushee Name" name="Rushee Name" onChange={e => doc.reshall = e.target.value} required />
                           <label for="Date"><b>Photo</b></label>
                           <input type="file" placeholder="Upload Photo" name="photo" onChange={e => handleSetPhoto(e.target.files[0])} required />
                       </div>
@@ -71,27 +129,13 @@ function ViewRushees(){
     
   } 
 
-    const [rushees, setRushees] = useState([])
-
-    if(rushees.length == 0){
-        fetch('http://localhost:8000/getRushees',{
-            headers : { 
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-            }
-        })
-        .then(response=> response.json())
-        .then(data=>{
-            setRushees(data)
-            console.log(data)
-        })
-    }
+    
 
     return (
         <>
         <h1 className="title">Rushees</h1>
         <div className="container">
-            {rushees && rushees.map((rushee) => <RusheeCard rushee={rushee}/>)}
+            {rushees && rushees.map((rushee) => <RusheeCard rushee={rushee} getRushees = {getRushees}/>)}
         </div>
         
         <div className= "add">
@@ -130,6 +174,8 @@ function RusheeCard(props){
 
   const [commentModal, setCommentModal] = useState(false)
 
+  const [viewComments, setViewComments] = useState(false)
+
   const [like, setLike]= useState(false)
 
   const handleLike = () => {
@@ -138,6 +184,38 @@ function RusheeCard(props){
 
   const handleDislike = () => {
     setLike(false)
+  }
+
+  const handleViewComments = () => {
+    setViewComments(true)
+  }
+
+  const deleteRushee = () => {
+    console.log("deleting " + props.rushee.username)
+    var info = {'query': props.rushee.username}
+    fetch("http://localhost:8000/deleteRushee", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+
+            body: JSON.stringify(info)
+
+
+        })
+        .then(respnse =>{
+                console.log(respnse)
+               
+                //close the modal
+                props.getRushees()
+                
+              handleClose()
+            }
+        )
+  }
+
+  const handleCloseComments = () => {
+    setViewComments(false)
   }
 
   const Like_Button = () => {
@@ -173,25 +251,104 @@ function RusheeCard(props){
     )
   }
 
+  const ViewAComment_Modal = () => {
+    return(
+      <Modal show={viewComments} onHide={handleCloseComments}>
+        <Modal.Header closeButton/>
+        <Modal.Title className="Modal-Title">
+          {props.rushee.first + " " + props.rushee.last}
+        </Modal.Title>
+        <Modal.Body>
+          <div>
+          {props.rushee.email}
+          </div>
+          <div>
+          {props.rushee.phone}
+          </div>
+          <div className="rushee_tables">
+            <div>
+              <h3 className="table-name">Comments</h3>
+              <div className="Modal-Table">
+                <table>
+                  <tbody>
+                    <tr>
+                      <th>Brother</th>
+                      <th>Comment</th>
+                    </tr>
+                    {props.rushee.comments && props.rushee.comments.map((comment) => {
+                      return (
+                        <tr>
+                          <td>{comment.user}</td>
+                          <td>{comment.comment}</td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div>
+              <h3 className="table-name">Events Attended</h3>
+              <div className="Modal-Table">
+                <table>
+                  <tbody>
+                    <tr>
+                      <th>Date</th>
+                      <th>Event</th>
+                    </tr>
+                    {props.rushee.events && props.rushee.events.map((event) => {
+                      return (
+                        <tr>
+                          <td>{event.date}</td>
+                          <td>{event.name}</td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+                    
+            </div>
+        
+            
+          </div>
+        </Modal.Body>
+      </Modal>
+    )
+  }
+
   
 
   return (
     <Card style={{ width: '12rem' }}>
       <Card.Img variant="top" src="holder.js/100px180" alt="Rushee Picture Here"/>
       <Card.Body>
-        <Card.Title>{props.rushee.name}</Card.Title>
+        <Card.Title>{props.rushee.first + " " + props.rushee.last}</Card.Title>
         <Card.Text>
-            {props.rushee.info}
+            {//TODO make this a drop down
+            props.rushee.major}
+        </Card.Text>
+        {/* <Card.Text>
+          {props.rushee.email}
         </Card.Text>
         <Card.Text>
-          Likes: {props.rushee.likes}
+          {props.rushee.phone}
+        </Card.Text> */}
+        <Card.Text>
+          {props.rushee.reshall}
+        </Card.Text>
+        <Card.Text>
+          Likes: {"NYI"}
         </Card.Text>
         <div className="Rushee-Buttons">
           <Button variant="outline-dark " onClick={handleAddAComment}>Comment</Button>
           <Like_Button/>
+          <Button variant="outline-dark" onClick={handleViewComments}>More Info</Button>
+          <Button variant="outline-dark" onClick={deleteRushee}>Delete Rushee</Button>
         </div>
       </Card.Body>
       <LeaveAComment_Modal/>
+      <ViewAComment_Modal/>
     </Card>
    
   );
