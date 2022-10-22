@@ -1,5 +1,6 @@
 import React from "react";
 import { useState } from 'react';
+import { ToggleButton, ToggleButtonGroup } from "react-bootstrap";
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import Modal from 'react-bootstrap/Modal'
@@ -10,10 +11,16 @@ function ViewRushees(props){
   console.log(props)
     const [rushees, setRushees] = useState([])
 
+    const [allRushees, setAllRushees] = useState(true)
+    const [ourRushees, setOurRushees] = useState(false)
 
+    // let allRushees = true
+    // let ourRushees = false;
   
 
     const [modal, setModal] = useState(false)
+
+
 
     var doc = {'first': "",
           'last': "",
@@ -22,6 +29,24 @@ function ViewRushees(props){
           'major': "",
           'phone': "",
           'housing': ""};
+
+
+    
+    const getRushees = () => {
+      //change to post for our rushees/ all rushees
+      fetch('http://localhost:8000/getRushees',{
+                  headers : { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                  }
+                })
+              .then(response=> response.json())
+              .then(data=>{
+                console.log("GETTING RUSHEES")
+                setRushees(data)
+                console.log(data)
+              })
+    }
 
     const handleAddRushee = () => {
       setModal(true)
@@ -44,23 +69,31 @@ function ViewRushees(props){
       setModal(false);
     }
 
+    const handleAllRushees = () => {
+      console.log("All Rushees")
+      setAllRushees(true)
+      setOurRushees(false)
+    }
+
+    const handleOurRushees = () => {
+      console.log("Our Rushees")
+      setAllRushees(false)
+      setOurRushees(true)
+    }
+
+    const handleToggleRushees = () => {
+      console.log("Toggle Rushees")
+      ourRushees = !ourRushees
+      allRushees = !allRushees
+      if(allRushees) {
+        console.log("all rushees")
+      } else {
+        console.log("Our rushees")
+      }
+    }
     
     
 
-    const getRushees = () => {
-      fetch('http://localhost:8000/getRushees',{
-                  headers : { 
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                  }
-                })
-              .then(response=> response.json())
-              .then(data=>{
-                console.log("GETTING RUSHEES")
-                setRushees(data)
-                console.log(data)
-              })
-    }
 
     const handleSubmit = () => {
       console.log(doc)
@@ -87,7 +120,6 @@ function ViewRushees(props){
     if(rushees.length == 0){
       getRushees()
   }
-
 
     const AddRushEvent_Rushee=  () => {
       return(
@@ -138,6 +170,19 @@ function ViewRushees(props){
     return (
         <>
         <h1 className="title">Rushees</h1>
+        <div className= "add">
+        <ToggleButtonGroup
+          color="primary"
+          name="toggle"
+  // value={alignment}
+          exclusive
+  // onChange={handleChange}
+          aria-label="Platform"
+        >
+        <ToggleButton active={allRushees} onClick={handleAllRushees} value="all">All Rushees</ToggleButton>
+        <ToggleButton active={ourRushees} value="ourList" onClick={handleOurRushees} >Our List</ToggleButton>
+      </ToggleButtonGroup>
+        </div>
         <div className="container">
             {rushees && rushees.map((rushee) => <RusheeCard rushee={rushee} getRushees = {getRushees} accountType = {props.accountType}/>)}
         </div>
@@ -323,8 +368,6 @@ function RusheeCard(props){
       </Modal>
     )
   }
-
-  
 
   return (
     <Card style={{ width: '12rem' }}>

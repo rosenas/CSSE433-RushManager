@@ -46,3 +46,4 @@ DONE%&%addUser%&%{"type": "rushee", "first": "b", "last": "b", "email": "b", "ma
 DONE%&%deleteRushee%&%b
 DONE%&%deleteRushee%&%j
 DONE%&%deleteRushee%&%y
+DONE%&%addUser%&%{"type": "rushee", "first": "j", "last": "j", "email": "j", "major": "j", "housing": "", "interests": [], "interestedInFIJI": false, "username": "j", "phone": "j", "fraternityInfo": {"FIJI": {"frat": "FIJI", "bidStatus": false, "rating": "none", "comments": [], "interested": true, "needsDiscussion": false}}}

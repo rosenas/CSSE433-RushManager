@@ -86,7 +86,8 @@ def getRushees():
   print("GETTING RUSHEES")
   readQueue()
   type = "rushee"
-  getQuery = {'selector': {'type': type}}          
+  #getQuery = {'selector': {'$and': [{'type': type}, {'fraternityInfo': {"FIJI": {'interested':True}}}]}}   
+  getQuery = {'selector': {'type': type}}
   res = db.find(getQuery)
   data = []
   for doc in res:
