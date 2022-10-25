@@ -57,6 +57,34 @@ def readQueue():
             newFile.append(line)
           else:
             newFile.append(line)
+        elif(split[1] == "addEvent"):
+          res = couchAddEvent((split[2]).strip(), split[3].strip())
+          if res:
+            line = "DONE%&%" + split[1] + "%&%" + split[2] + "%&%" + split[3] 
+            newFile.append(line)
+          else:
+            newFile.append(line)
+        elif(split[1] == "deleteEvent"):
+          res = couchDeleteEvent((split[2]).strip())
+          if res:
+            line = "DONE%&%" + split[1] + "%&%" + split[2]
+            newFile.append(line)
+          else:
+            newFile.append(line)
+        elif(split[1] == "addRSVP"):
+          res = couchRSVP("add", (split[2]).strip(), split[3].strip())
+          if res:
+            line = "DONE%&%" + split[1] + "%&%" + split[2] + "%&%" + split[3] 
+            newFile.append(line)
+          else:
+            newFile.append(line)
+        elif(split[1] == "removeRSVP"):
+          res = couchRSVP("delete", (split[2]).strip(), split[3].strip())
+          if res:
+            line = "DONE%&%" + split[1] + "%&%" + split[2] + "%&%" + split[3] 
+            newFile.append(line)
+          else:
+            newFile.append(line)
         
 
       else: #already done
@@ -436,18 +464,92 @@ def getRusheesInterestedIn():
 
 @app.route("/getEvents")
 def getEvents():
-  return "Getting the events"
+  readQueue()
+  type = "event"
+  getQuery = {'selector': {'type': type}}
+  res = db.find(getQuery)
+  data = []
+  for doc in res:
+    data.append(doc)
+  return data
+  
 
 @app.route("/addEvent", methods = ['POST'])
 def addEvent():
+  print("ADD EVENT")
+  data = ""
+  if request.method == 'POST':
+    data = request.get_json()
+  queue("TODO%&%addEvent%&%" + data["name"] + "%&%" + data["date"])
+  return {}
+
+def couchAddEvent(name, date):
+  if not db:
+    return False
+  doc = {
+    "type": "event",
+    "name": name,
+    "date": date,
+    "attended": []
+  }
+  res = db.save(doc)
+  return True
+
+@app.route("/addRSVP", methods = ['POST'])
+def addRSVP():
   
   if request.method == 'POST':
     data = request.get_json()
-    queue("adding event, " + data['test'])
-    print(data["test"]) 
-    return "Adding an event"
 
-# if __name__ == "__main__":
-#   app.run()
+  queue("TODO%&%addRSVP%&%" + data["eventName"] + "%&%" + data["username"])
+  return {}
+
+@app.route("/removeRSVP", methods = ['POST'])
+def removeRSVP():
+  
+  if request.method == 'POST':
+    data = request.get_json()
+
+  queue("TODO%&%removeRSVP%&%" + data["eventName"] + "%&%" + data["username"])
+  return {}
+
+def couchRSVP(type, eventName, username):
+  #type = add or remove
+  if not db:
+    return False
+
+  if(type == "delete"):
+    #dlete rsvp from event
+    None
+  elif(type == "add"):
+    #add rsvp to event
+    None
+  None
+
+  #TODO : Implement adding rsvp
+  return True
+
+
+
+@app.route("/deleteEvent", methods = ['POST'])
+def deleteEvent():
+  print("DEL EVENT")
+  data = ""
+  if request.method == 'POST':
+    data = request.get_json()
+  queue("TODO%&%deleteEvent%&%" + data["name"])
+  return {}
+
+def couchDeleteEvent(name):
+  if not db:
+    return False
+  eventQuery = {'selector': {'$and': [{'type': "event"}, {'name': name}]}}
+  res = db.find(eventQuery)
+  ret = None
+  for doc in res:
+    ret = db.delete(doc)
+  #TODO : Check ret
+  return True
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0',port=5000)

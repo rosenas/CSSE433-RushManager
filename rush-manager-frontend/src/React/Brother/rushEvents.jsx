@@ -25,11 +25,26 @@ function RushEvents(){
     }
 
 
+    const getEvents = () => {
+        console.log("GETTING EVENTS")
+        fetch('http://localhost:8000/getEvents', {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        setEvents(data)
+                        console.log(data);
+                    })
+    }
+
     const [modal, setModal] = useState(false)
 
     const handleAddRushEvent = () => setModal(true)
 
-    const handleClose = () => setModal(false)
+    const handleClose = () => {setModal(false)}
 
     const handleSubmit = e =>{
         console.log(tempEventName);
@@ -49,24 +64,8 @@ function RushEvents(){
         })
         .then(response => response.json())
             .then(data => {
-               
-                //close the modal
+                getEvents()
                 handleClose()
-                //get the updated list
-                fetch('http://localhost:8000/getEvents', {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    }
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        setEvents(data)
-                        console.log(data);
-                        
-                        
-                    })
-
             })
 
 
@@ -82,17 +81,18 @@ function RushEvents(){
     }
 
     if(events.length == 0){
-        fetch('http://localhost:8000/getEvents',{
-            headers : { 
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-            }
-        })
-        .then(response=> response.json())
-        .then(data=>{
-            //console.log(data)
-            setEvents(data)
-        })
+        getEvents()
+        // fetch('http://localhost:8000/getEvents',{
+        //     headers : { 
+        //     'Content-Type': 'application/json',
+        //     'Accept': 'application/json'
+        //     }
+        // })
+        // .then(response=> response.json())
+        // .then(data=>{
+        //     //console.log(data)
+        //     setEvents(data)
+        // })
     }
 
     const AddRushEvent_Modal=  () => {

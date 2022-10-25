@@ -20,3 +20,10 @@ DONE%&%deleteBrother%&%v
 DONE%&%deleteBrother%&%o
 DONE%&%addUser%&%{"type": "requestedBrother", "first": "w", "last": "w", "email": "w", "major": "w", "housing": "w", "interests": [], "interestedInFIJI": false, "username": "w", "phone": "w", "fraternityInfo": {"FIJI": {"frat": "FIJI", "bidStatus": false, "rating": "none", "comments": [], "likes": [], "interested": true, "needsDiscussion": false}}}
 DONE%&%changeUserType%&%brother%&%w
+DONE%&%addEvent%&%Casino Night%&%10/3
+DONE%&%addEvent%&%Second Formals%&%10/22
+DONE%&%addEvent%&%First Formals%&%10/1
+DONE%&%addEvent%&%f%&%f
+DONE%&%addEvent%&%f%&%f
+DONE%&%addEvent%&%Bowling%&%9/20
+DONE%&%addEvent%&%Event%&%10/1

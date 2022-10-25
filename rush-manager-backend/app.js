@@ -39,7 +39,6 @@ app.get('/', (req, res) => {
 
 //TODO make this a post and check for verification
 app.get("/getRushees", async (req, res1) => {
-  console.log("get rushees")
   request('http://127.0.0.1:5000/getRushees', {
     json: true
   }, (err, res, body) => {
@@ -51,7 +50,6 @@ app.get("/getRushees", async (req, res1) => {
 })
 
 app.get("/getBrothers", async (req, res1) => {
-  console.log("get rushees")
   request('http://127.0.0.1:5000/getBrothers', {
     json: true
   }, (err, res, body) => {
@@ -63,65 +61,30 @@ app.get("/getBrothers", async (req, res1) => {
 })
 
 
-
-
-
-
-
-
-app.get("/getOurRushees", async (req, res1) => {
-  console.log("get rushees")
-  request('http://127.0.0.1:5000/getOurRushees', {
-    json: true
-  }, (err, res, body) => {
-    if (err) {
-      return console.log(err);
-    }
-    console.log("res:")
-    console.log(body);
-    res1.send(body)
-    
-  });
-  //res.send(rushees)
-})
-
-app.get("/getEvents", async (req, res) => {
-  res.send(events)
-  request('http://127.0.0.1:5000/', {
+app.get("/getEvents", async (req, res1) => {
+  request('http://127.0.0.1:5000/getEvents', {
     json: true
   }, (err, res, body) => {
     if (err) {
       console.log("ERROR")
       return console.log(err);
     }
-    
+    res1.send(body)
     console.log(body);
-    //res.send(events)
   });
 })
 
-app.post("/addEvent", (req, res) => {
-  let name = req.body.name 
-  let date = req.body.date
-
-  events.push({"name": name, "date": date})
-
-  console.log(req.body)
-  console.log(date)
-
-  res.send({"status": "success"})
-
+app.post("/addEvent", (req, res1) => {
+  let data = {"name": req.body.name,
+              "date": req.body.date}
   request.post('http://127.0.0.1:5000/addEvent', {
     json: true,
-    body: {
-      test : "test"
-    }
+    body: data
   }, (err, res, body) => {
     if (err) {
       return console.log(err);
     }
-    
-    console.log(body);
+    res1.send(body)
   });
 
 })
@@ -135,13 +98,11 @@ app.post("/addBrother", (req, res1) => {
       return console.log(err);
     }
     res1.send("Added")
-    //console.log(body);
   });
 
 })
 
 app.post("/addRushee", (req, res1) => {
-  console.log(req.body.first)
   request.post('http://127.0.0.1:5000/addRushee', {
     json: true,
     body: req
@@ -150,13 +111,11 @@ app.post("/addRushee", (req, res1) => {
       return console.log(err);
     }
     res1.send("Added")
-    //console.log(body);
   });
 
 })
 
 app.post("/changeFratInterest", (req, res1) => {
-  console.log("HERE")
   request.post('http://127.0.0.1:5000/changeFratInterest', {
     json: true,
     body: req
@@ -170,7 +129,6 @@ app.post("/changeFratInterest", (req, res1) => {
 })
 
 app.post("/likeRushee", (req, res1) => {
-  console.log("HERE")
   request.post('http://127.0.0.1:5000/likeRushee', {
     json: true,
     body: req
@@ -184,7 +142,6 @@ app.post("/likeRushee", (req, res1) => {
 })
 
 app.post("/dislikeRushee", (req, res1) => {
-  console.log("HERE")
   request.post('http://127.0.0.1:5000/dislikeRushee', {
     json: true,
     body: req
@@ -198,7 +155,6 @@ app.post("/dislikeRushee", (req, res1) => {
 })
 
 app.post("/createUser", (req, res1) => {
-  console.log(req.body.first)
   request.post('http://127.0.0.1:5000/createUser', {
     json: true,
     body: req
@@ -207,7 +163,6 @@ app.post("/createUser", (req, res1) => {
       return console.log(err);
     }
     res1.send("Added")
-    //console.log(body);
   });
 
 })
@@ -221,7 +176,6 @@ app.post("/deleteRushee", (req, res1) => {
       return console.log(err);
     }
     res1.send("Deleted")
-    //console.log(body);
   });
 
 })
@@ -235,7 +189,6 @@ app.post("/deleteBrother", (req, res1) => {
       return console.log(err);
     }
     res1.send("Deleted")
-    //console.log(body);
   });
 
 })
@@ -249,7 +202,6 @@ app.post("/addAsBrother", (req, res1) => {
       return console.log(err);
     }
     res1.send("Changed to brother")
-    //console.log(body);
   });
 
 })
@@ -264,7 +216,6 @@ app.post("/changeBid", (req, res1) => {
       return console.log(err);
     }
     res1.send("Changed")
-    //console.log(body);
   });
 
 })
@@ -292,83 +243,3 @@ app.post("/rsvp", (req, res) => {
 app.get("/contactInfo", (req, res) => {
   
 })
-
-let rushees = [
-  {
-    "name": "Ari Rosen",
-    "info": "Interested",
-    'likes': 3,
-    'comments':[
-      {
-        "user": "user1",
-        "comment": "He's got that dawg him"
-      },
-      {
-        "user": "user2",
-        "comment": "He's one of them ones"
-      }
-    ], 
-    'events': [
-      {
-        "name": "Monday Night Football",
-        "date": "9/27"
-      }
-    ]
-      
-
-    
-    },
-  {
-    "name": "Grant Ripperda",
-    "info": "Bid",
-    'likes': 6
-  },
-  {
-    "name": "Jared Petrisko",
-    "info": "Interested",
-    'likes': 6
-  },
-  {
-    "name": "Dalton Busboom",
-    "info": "Just Started rushing",
-    'likes': 0
-  }, 
-  {
-    "name": "Garrett Loyed",
-    "info": "Not rushing",
-    'likes': 0
-  },
-  {
-    "name": "Ethan Swanner",
-    "info": "Fat",
-    'likes': 3
-  }
-
-]
-
-let events = [
-  {
-    "name": "Monday Night Football",
-    "date": "9/27",
-    "attending":[
-        {
-        "name": "Garrett Loyed",
-        "info": "Not rushing",
-        'likes': 0
-      },
-      {
-        "name": "Ethan Swanner",
-        "info": "Fat",
-        'likes': 3
-      }
-    ]
-  },
-  {
-    "name": "Cookout",
-    "date": "9/30"
-  },
-  {
-    "name": "Chick-Fil-A",
-    "date": "10/1"
-  }
-]
