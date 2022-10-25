@@ -5,7 +5,7 @@ import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
 
 
-function Navigation(){
+function Navigation(props){
 
     const handleSearch = () => {
         
@@ -23,6 +23,21 @@ function Navigation(){
                     <NavLink to="/rushEvents">Rush Events</NavLink> 
                 </Nav.Link>
             </Nav.Item>
+            {/* {console.log("ACC TYPE:" + props.accountType)} */}
+           
+            <Nav.Item>
+            <Nav.Link>
+                <NavLink to="/viewBrothers">Brothers</NavLink> 
+            </Nav.Link>
+        </Nav.Item>
+            
+            {props.accountType === "admin" &&
+            <Nav.Item>
+            <Nav.Link>
+                <NavLink to="/rushEvents">Administration</NavLink> 
+            </Nav.Link>
+        </Nav.Item>
+            }
             <Form>
             <Form.Control
               type="search"

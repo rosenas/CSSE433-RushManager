@@ -2,6 +2,7 @@ import React from "react";
 import { useState } from 'react';
 import {default as Login} from "../Login/Login"
 import {default as ViewRushees} from "../Brother/viewRushees"
+import {default as ViewBrothers} from "../Brother/viewBrothers"
 import {default as RushEvents} from "../Rushee/rushEvents"
 import {default as RushEvents_Brother} from "../Brother/rushEvents"
 import {default as Navigation_Brother} from "../Brother/navigation"
@@ -45,13 +46,15 @@ function LoggedInRouter({accountType, setToken }){
         return (
             <Router>
                 <div className="Navigation">
-                    <Navigation_Brother/>
+                    <Navigation_Brother accountType = "admin"/>
                     <Button className="LogOut_Button" onClick={handleLogOut}>Log out</Button>
                 </div>
                  <Routes>
                     <Route path="/rushEvents" element={<RushEvents_Brother accountType = "admin"/>}/>
 
                     <Route path="/viewRushees" element={<ViewRushees accountType = {"admin"}/>}/>
+
+                    <Route path="/viewBrothers" element={<ViewBrothers accountType = {"admin"}/>}/>
 
                     <Route path= "*" element={<ViewRushees accountType = {"admin"}/>}/>
                 </Routes>
@@ -71,6 +74,8 @@ function LoggedInRouter({accountType, setToken }){
 
                     <Route path="/contact" element={<Contact/>}/>
 
+                    <Route path="/viewBrothers" element={<ViewBrothers accountType = {"rushee"}/>}/>
+
                     <Route path= "*" element={<RushEvents/>}/>
                 </Routes>
             </Router>
@@ -83,13 +88,15 @@ function LoggedInRouter({accountType, setToken }){
         return (
             <Router>
                 <div className="Navigation">
-                    <Navigation_Brother/>
+                    <Navigation_Brother accountType = "brother"/>
                     <Button className="LogOut_Button" onClick={handleLogOut}>Log out</Button>
                 </div>
                  <Routes>
                     <Route path="/rushEvents" element={<RushEvents_Brother accountType = "brother"/>}/>
 
                     <Route path="/viewRushees" element={<ViewRushees accountType = {"brother"}/>}/>
+
+                    <Route path="/viewBrothers" element={<ViewBrothers accountType = {"brother"}/>}/>
 
                     <Route path= "*" element={<ViewRushees accountType = {"brother"}/>}/>
                 </Routes>

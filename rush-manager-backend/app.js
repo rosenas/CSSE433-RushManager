@@ -46,6 +46,37 @@ app.get("/getRushees", async (req, res1) => {
     if (err) {
       return console.log(err);
     }
+    res1.send(body)
+  });
+})
+
+app.get("/getBrothers", async (req, res1) => {
+  console.log("get rushees")
+  request('http://127.0.0.1:5000/getBrothers', {
+    json: true
+  }, (err, res, body) => {
+    if (err) {
+      return console.log(err);
+    }
+    res1.send(body)
+  });
+})
+
+
+
+
+
+
+
+
+app.get("/getOurRushees", async (req, res1) => {
+  console.log("get rushees")
+  request('http://127.0.0.1:5000/getOurRushees', {
+    json: true
+  }, (err, res, body) => {
+    if (err) {
+      return console.log(err);
+    }
     console.log("res:")
     console.log(body);
     res1.send(body)
@@ -95,6 +126,19 @@ app.post("/addEvent", (req, res) => {
 
 })
 
+app.post("/addBrother", (req, res1) => {
+  request.post('http://127.0.0.1:5000/addBrother', {
+    json: true,
+    body: req
+  }, (err, res, body) => {
+    if (err) {
+      return console.log(err);
+    }
+    res1.send("Added")
+    //console.log(body);
+  });
+
+})
 
 app.post("/addRushee", (req, res1) => {
   console.log(req.body.first)
@@ -107,6 +151,48 @@ app.post("/addRushee", (req, res1) => {
     }
     res1.send("Added")
     //console.log(body);
+  });
+
+})
+
+app.post("/changeFratInterest", (req, res1) => {
+  console.log("HERE")
+  request.post('http://127.0.0.1:5000/changeFratInterest', {
+    json: true,
+    body: req
+  }, (err, res, body) => {
+    if (err) {
+      return console.log(err);
+    }
+    res1.send("Changed")
+  });
+
+})
+
+app.post("/likeRushee", (req, res1) => {
+  console.log("HERE")
+  request.post('http://127.0.0.1:5000/likeRushee', {
+    json: true,
+    body: req
+  }, (err, res, body) => {
+    if (err) {
+      return console.log(err);
+    }
+    res1.send("Changed")
+  });
+
+})
+
+app.post("/dislikeRushee", (req, res1) => {
+  console.log("HERE")
+  request.post('http://127.0.0.1:5000/dislikeRushee', {
+    json: true,
+    body: req
+  }, (err, res, body) => {
+    if (err) {
+      return console.log(err);
+    }
+    res1.send("Changed")
   });
 
 })
@@ -127,7 +213,6 @@ app.post("/createUser", (req, res1) => {
 })
 
 app.post("/deleteRushee", (req, res1) => {
-  console.log(req.body.first)
   request.post('http://127.0.0.1:5000/deleteRushee', {
     json: true,
     body: req
@@ -136,6 +221,49 @@ app.post("/deleteRushee", (req, res1) => {
       return console.log(err);
     }
     res1.send("Deleted")
+    //console.log(body);
+  });
+
+})
+
+app.post("/deleteBrother", (req, res1) => {
+  request.post('http://127.0.0.1:5000/deleteBrother', {
+    json: true,
+    body: req
+  }, (err, res, body) => {
+    if (err) {
+      return console.log(err);
+    }
+    res1.send("Deleted")
+    //console.log(body);
+  });
+
+})
+
+app.post("/addAsBrother", (req, res1) => {
+  request.post('http://127.0.0.1:5000/addAsBrother', {
+    json: true,
+    body: req
+  }, (err, res, body) => {
+    if (err) {
+      return console.log(err);
+    }
+    res1.send("Changed to brother")
+    //console.log(body);
+  });
+
+})
+
+
+app.post("/changeBid", (req, res1) => {
+  request.post('http://127.0.0.1:5000/changeBid', {
+    json: true,
+    body: req
+  }, (err, res, body) => {
+    if (err) {
+      return console.log(err);
+    }
+    res1.send("Changed")
     //console.log(body);
   });
 

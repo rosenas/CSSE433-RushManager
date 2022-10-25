@@ -88,6 +88,8 @@ function Login({ setToken, setAccountType }) {
 
 
     const handleSubmitCreateUser = () => {
+            console.log("NEW USER")
+            
             console.log(doc)
             fetch("http://localhost:8000/createUser", {
                   method: 'POST',

@@ -11,12 +11,17 @@ function Navigation(){
         <Nav variant="tabs">
              <Nav.Item>
                 <Nav.Link >
-                    <NavLink to="/Contact">Contact</NavLink>
+                    <NavLink to="/Contact">FIJI Info</NavLink>
                 </Nav.Link>
             </Nav.Item>
             <Nav.Item>
                 <Nav.Link>
                     <NavLink to="/rushEvents">Rush Events</NavLink> 
+                </Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+                <Nav.Link>
+                    <NavLink to="/viewBrothers">Brothers</NavLink> 
                 </Nav.Link>
             </Nav.Item>
         </Nav>

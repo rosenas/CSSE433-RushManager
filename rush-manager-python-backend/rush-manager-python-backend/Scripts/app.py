@@ -50,6 +50,14 @@ def readQueue():
             newFile.append(line)
           else:
             newFile.append(line)
+        elif(split[1] == "deleteBrother"):
+          res = couchDeleteBrother((split[2]).strip())
+          if res:
+            line = "DONE%&%" + split[1] + "%&%" + split[2] 
+            newFile.append(line)
+          else:
+            newFile.append(line)
+        
 
       else: #already done
         newFile.append(line)
@@ -74,19 +82,18 @@ def createUser():
   print("CREATE USER")
   if request.method == 'POST':
     data = request.get_json().get('body')
-  if(data.get('accountType' == "brother")):
+
+  if(data.get('accountType') == "brother"):
     addUser(data, "requestedBrother")
-  if(data.get('accountType' == "rushee")):
+  if(data.get('accountType') == "rushee"):
     addUser(data, "requestedRushee")
   return []
   
 
 @app.route("/getRushees")
 def getRushees():
-  print("GETTING RUSHEES")
   readQueue()
   type = "rushee"
-  #getQuery = {'selector': {'$and': [{'type': type}, {'fraternityInfo': {"FIJI": {'interested':True}}}]}}   
   getQuery = {'selector': {'type': type}}
   res = db.find(getQuery)
   data = []
@@ -94,8 +101,21 @@ def getRushees():
     data.append(doc)
   return data
 
+@app.route("/getOurRushees")
+def getOurRushees():
+  print("GETTING RUSHEES")
+  readQueue()
+  type = "rushee"
+  getQuery = {'selector': {'$and': [{'type': type}, {'fraternityInfo': {"FIJI": {'interested':True}}}]}}   
+  res = db.find(getQuery)
+  data = []
+  for doc in res:
+    data.append(doc)
+  return data
+
 def addUser(data, type):
-  doc = {
+  if(type == "brother"):
+    doc = {
     "type": type,
     "first": data.get('first'),
     "last": data.get('last'),
@@ -103,21 +123,39 @@ def addUser(data, type):
     "major": data.get('major'),
     "housing": data.get('housing'),
     "interests": [],
-    "interestedInFIJI": False,
+    "fraternity": "FIJI",
     "username": data.get('username'),
     "phone": data.get('phone'),
-    "fraternityInfo": {
-      "FIJI":
-      {
-        "frat": "FIJI", 
-        "bidStatus": False,
-        "rating": 'none',
-        "comments": [],
-        "interested": True,
-        "needsDiscussion": False
+  }
+  else:
+    doc = {
+      "type": type,
+      "first": data.get('first'),
+      "last": data.get('last'),
+      "email": data.get('email'),
+      "major": data.get('major'),
+      "housing": data.get('housing'),
+      "interests": [],
+      "interestedInFIJI": False,
+      "username": data.get('username'),
+      "phone": data.get('phone'),
+      "fraternityInfo": {
+        "FIJI":
+        {
+          "frat": "FIJI", 
+          "bidStatus": False,
+          "rating": 'none',
+          "comments": [],
+          "likes": [],
+          "interested": True,
+          "needsDiscussion": False
+        }
       }
     }
-  }
+  if(type == "requestedRushee"):
+    doc['type'] = "rushee"
+    doc['fraternityInfo']["FIJI"]['interested'] = False
+
   queue("TODO%&%" + "addUser%&%" + json.dumps(doc))
   return True
 
@@ -133,6 +171,21 @@ def addRushee():
   
   
   return "Rushee added"
+
+
+@app.route("/addAsBrother", methods = ['POST'])
+def addAsBrother():
+  #from a rush chairs "add rushee button"
+  data = ""
+  print("ADDING AS BROTHER")
+  if request.method == 'POST':
+    data = request.get_json().get('body')
+  print(data)
+  queue("TODO%&%changeUserType%&%brother%&%" + data.get('username'))
+  
+  
+  return "Rushee added"
+
 
 def couchChangeUserType(username, type):
   if not db:
@@ -179,14 +232,15 @@ def couchDeleteRushee(data):
 
 @app.route("/getBrothers")
 def getBrothers():
+  readQueue()
   type = "brother"
   frat = "FIJI"
-  getQuery = {'selector': {'$and': [{'type': type}, {'fraternity': frat}]}}        
+  getQuery = {'selector': {'$or': [{'type': "brother"}, {'type': "requestedBrother"}]}}   
   res = db.find(getQuery)
+  data = []
   for doc in res:
-    print(doc)
-  #return res
-  return res
+    data.append(doc)
+  return data
 
 @app.route("/addBrother", methods = ['POST'])
 def addBrother():
@@ -196,17 +250,32 @@ def addBrother():
   if request.method == 'POST':
     data = request.get_json().get('body')
   addUser(data, "brother")
-  #queue("TODO%&%changeUserType%&%brother%&%" + data.get('username'))
+  
   return "Brother added"
 
-@app.route("/deleteBrother")
+
+@app.route("/deleteBrother", methods = ['POST'])
 def deleteBrother():
-  searchInput = ""
-  userQuery = {'selector': {'$and': [{'type': "brother"}, {'$or': [{'email': searchInput}, {'username': searchInput}]}]}}
+
+  data = ""
+  if request.method == 'POST':
+    data = request.get_json().get('body').get('query')
+  # searchInput = ""
+  queue("TODO%&%" + "deleteBrother%&%" + data)
+  
+  return "Brother deleted"
+
+
+def couchDeleteBrother(data):
+  if not db:
+    return False
+  userQuery = {'selector': {'$and': [{'$or': [{'type': "brother"}, {'type': "requestedBrother"}]}, {'$or': [{'email': data}, {'username': data}]}]}}
   res = db.find(userQuery)
   for doc in res:
     db.delete(doc)
-  return "Brother deleted"
+  #TODO 
+  #check what res returns if the save was unsuccessful
+  return True
 
 @app.route("/searchBrother")
 def searchBrother():
@@ -246,21 +315,66 @@ def searchRushee():
 #     print(data["test"]) 
 #     return "Adding an event"
 
-@app.route("/changeFratInterest")
+
+@app.route("/changeFratInterest", methods = ['POST'])
 def changeFratInterest():
-  #need rushee's username
+  #TODO add to queu
   inp = ""
-  rusheeQuery = {'selector': {'$and': [{'type': 'rushee'}, {'$or': [{'email': inp}, {'username': inp}]}]}}
+  if request.method == 'POST':
+    inp = request.get_json().get('body').get('query')
+  rusheeQuery = {'selector': {'$and': [{'type': 'rushee'}, {'username': inp}]}}
   res = db.find(rusheeQuery)
   for row in res:
     doc = db.get(row.id)
     doc['fraternityInfo']["FIJI"]['interested'] = not doc['fraternityInfo']["FIJI"]['interested']
     db.save(doc)
+  return []
 
-@app.route("/changeBid")
-def changeBid():
+
+@app.route("/likeRushee", methods = ['POST'])
+def likeRushee():
+  #TODO add to queu
   inp = ""
-  rusheeQuery = {'selector': {'$and': [{'type': 'rushee'}, {'$or': [{'email': inp}, {'username': inp}]}]}}
+  if request.method == 'POST':
+    inp = request.get_json().get('body')
+  rushee = inp.get('rushee')
+  brother = inp.get('user')
+  rusheeQuery = {'selector': {'$and': [{'type': 'rushee'}, {'username': rushee}]}}
+  res = db.find(rusheeQuery)
+  for row in res:
+    doc = db.get(row.id)
+    doc['fraternityInfo']["FIJI"]['likes'].append(brother)
+    db.save(doc)
+  return []
+
+
+@app.route("/dislikeRushee", methods = ['POST'])
+def dislikeRushee():
+  #TODO add to queu
+  inp = ""
+  if request.method == 'POST':
+    inp = request.get_json().get('body')
+  rushee = inp.get('rushee')
+  brother = inp.get('user')
+  rusheeQuery = {'selector': {'$and': [{'type': 'rushee'}, {'username': rushee}]}}
+  res = db.find(rusheeQuery)
+  for row in res:
+    doc = db.get(row.id)
+    doc['fraternityInfo']["FIJI"]['likes'].remove(brother)
+    db.save(doc)
+  return []
+
+
+
+
+@app.route("/changeBid", methods = ['POST'])
+def changeBid():
+  #TODO add to queu
+  inp = ""
+  if request.method == 'POST':
+    inp = request.get_json().get('body')
+  rushee = inp.get('query')
+  rusheeQuery = {'selector': {'$and': [{'type': 'rushee'}, {'$or': [{'email': rushee}, {'username': rushee}]}]}}
   res = db.find(rusheeQuery)
   for row in res:
     doc = db.get(row.id)

@@ -6,13 +6,19 @@ import Card from 'react-bootstrap/Card';
 import Modal from 'react-bootstrap/Modal'
 import "../../CSS/index.css"
 
+
+
 function ViewRushees(props){
 
   console.log(props)
     const [rushees, setRushees] = useState([])
+    const [ourRusheesList, setOurRusheesList] = useState([])
+
+    const [filteredRusheeList, setFilteredRusheeList] = useState([])
 
     const [allRushees, setAllRushees] = useState(true)
     const [ourRushees, setOurRushees] = useState(false)
+    const [rusheesWithBids, setRusheesWithBids] = useState(false)
 
     // let allRushees = true
     // let ourRushees = false;
@@ -43,7 +49,65 @@ function ViewRushees(props){
               .then(response=> response.json())
               .then(data=>{
                 console.log("GETTING RUSHEES")
+
                 setRushees(data)
+                filterRushees(data)
+                // if(allRushees){
+                //   setFilteredRusheeList(data)
+                // } else if(ourRushees) {
+                //   var filt = data.filter(rushee => {
+                //     if(rushee.fraternityInfo["FIJI"].interested) {
+                //       return rushee
+                //     }
+                //   });
+                //   setFilteredRusheeList(filt)
+                // } else if(rusheesWithBids) {
+                //   var filt = data.filter(rushee => {
+                //     if(rushee.fraternityInfo["FIJI"].bidStatus) {
+                //       return rushee
+                //     }
+                //   });
+                //   setFilteredRusheeList(filt)
+                // }
+
+                
+                //console.log(data)
+              })
+    }
+
+    async function filterRushees(data) {
+      let filt = []
+      if(allRushees){
+        setFilteredRusheeList(data)
+      } else if(ourRushees) {
+        filt = data.filter(rushee => {
+          if(rushee.fraternityInfo["FIJI"].interested) {
+            return rushee
+          }
+        });
+        setFilteredRusheeList(filt)
+      } else if(rusheesWithBids) {
+        filt = data.filter(rushee => {
+          if(rushee.fraternityInfo["FIJI"].bidStatus) {
+            return rushee
+          }
+        });
+        setFilteredRusheeList(filt)
+      }
+    }
+
+    const getOurRushees = () => {
+      //change to post for our rushees/ all rushees
+      fetch('http://localhost:8000/getOurRushees',{
+                  headers : { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                  }
+                })
+              .then(response=> response.json())
+              .then(data=>{
+                console.log("GETTING OUR RUSHEES")
+                setOurRusheesList(data)
                 console.log(data)
               })
     }
@@ -70,15 +134,37 @@ function ViewRushees(props){
     }
 
     const handleAllRushees = () => {
+      setFilteredRusheeList(rushees)
       console.log("All Rushees")
       setAllRushees(true)
       setOurRushees(false)
+      setRusheesWithBids(false)
     }
 
     const handleOurRushees = () => {
+      const filt = rushees.filter(rushee => {
+        if(rushee.fraternityInfo["FIJI"].interested) {
+          return rushee
+        }
+      });
+      setFilteredRusheeList(filt)
       console.log("Our Rushees")
       setAllRushees(false)
+      setRusheesWithBids(false)
       setOurRushees(true)
+    }
+
+    const handleRusheesWithBids = () => {
+      const filt = rushees.filter(rushee => {
+        if(rushee.fraternityInfo["FIJI"].bidStatus) {
+          return rushee
+        }
+      });
+      setFilteredRusheeList(filt)
+      console.log("Bidded Rushees")
+      setRusheesWithBids(true)
+      setAllRushees(false)
+      setOurRushees(false) 
     }
 
     const handleToggleRushees = () => {
@@ -109,6 +195,7 @@ function ViewRushees(props){
                
                 //close the modal
                 getRushees()
+                // getOurRushees()
                 
               handleClose()
             }
@@ -119,6 +206,7 @@ function ViewRushees(props){
 
     if(rushees.length == 0){
       getRushees()
+      // getOurRushees()
   }
 
     const AddRushEvent_Rushee=  () => {
@@ -146,7 +234,7 @@ function ViewRushees(props){
                           <label for="Event"><b>Major</b></label>
                           <input type="text" placeholder="Enter Rushee Name" name="Rushee Name" onChange={e => doc.major = e.target.value} required />
                           <label for="Event"><b>ResHall</b></label>
-                          <input type="text" placeholder="Enter Rushee Name" name="Rushee Name" onChange={e => doc.reshall = e.target.value} required />
+                          <input type="text" placeholder="Enter Rushee Name" name="Rushee Name" onChange={e => doc.housing = e.target.value} required />
                           <label for="Date"><b>Photo</b></label>
                           <input type="file" placeholder="Upload Photo" name="photo" onChange={e => handleSetPhoto(e.target.files[0])} required />
                       </div>
@@ -181,10 +269,12 @@ function ViewRushees(props){
         >
         <ToggleButton active={allRushees} onClick={handleAllRushees} value="all">All Rushees</ToggleButton>
         <ToggleButton active={ourRushees} value="ourList" onClick={handleOurRushees} >Our List</ToggleButton>
+        <ToggleButton active={rusheesWithBids} value="bids" onClick={handleRusheesWithBids} >Bids</ToggleButton>
       </ToggleButtonGroup>
         </div>
         <div className="container">
-            {rushees && rushees.map((rushee) => <RusheeCard rushee={rushee} getRushees = {getRushees} accountType = {props.accountType}/>)}
+          {/* make a filter for options */}
+          {rushees && filteredRusheeList.map((rushee) => <RusheeCard rushee={rushee} rusheesWithBids={rusheesWithBids} ourRushees={ourRushees} allRushees={allRushees} getOurRushees={getOurRushees} getRushees = {getRushees} accountType = {props.accountType}/>)}
         </div>
         
         {
@@ -228,14 +318,44 @@ function RusheeCard(props){
 
   const [viewComments, setViewComments] = useState(false)
 
-  const [like, setLike]= useState(false)
-
   const handleLike = () => {
-    setLike(true)
+      console.log("LIKE")
+      //console.log(props)
+      const loggedInUsername = "rippy"
+      var info = {'user': loggedInUsername, 'rushee': props.rushee.username}
+      fetch("http://127.0.0.1:8000/likeRushee", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(info)
+    })
+    .then(respnse =>{
+      console.log(props)
+            props.getRushees()
+            // props.getOurRushees()
+        }
+    )
   }
 
   const handleDislike = () => {
-    setLike(false)
+    console.log("DISLIKE")
+      //console.log(props)
+      const loggedInUsername = "rippy"
+      var info = {'user': loggedInUsername, 'rushee': props.rushee.username}
+      fetch("http://127.0.0.1:8000/dislikeRushee", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(info)
+    })
+    .then(respnse =>{
+      console.log(props)
+            props.getRushees()
+            // props.getOurRushees()
+        }
+    )
   }
 
   const handleViewComments = () => {
@@ -261,7 +381,6 @@ function RusheeCard(props){
                 //close the modal
                 props.getRushees()
                 
-              handleClose()
             }
         )
   }
@@ -271,13 +390,56 @@ function RusheeCard(props){
   }
 
   const Like_Button = () => {
-    if(like){
+    const likes = props.rushee.fraternityInfo["FIJI"].likes
+    const username = "rippy"
+
+    //console.log(likes.includes(username))
+    if(likes.includes(username)){
       return(
         <Button onClick={handleDislike} variant="outline-danger" >Dislike</Button>
       )
     }else{
       return(
         <Button  onClick={handleLike} variant="outline-success" >Like</Button>
+      )
+    }
+  }
+
+  const toggleBidStatus = () => {
+    var info = {'query': props.rushee.username}
+    console.log(props.rushee)
+    fetch("http://localhost:8000/changeBid", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+
+            body: JSON.stringify(info)
+
+
+        })
+        .then(respnse =>{
+                console.log(respnse)
+               
+                //close the modal
+                props.getRushees()
+                
+            }
+        )
+  }
+
+  const Bid_Button = () => {
+    //const likes = props.rushee.fraternityInfo["FIJI"].likes
+    //const username = "rippy"
+
+    //console.log(likes.includes(username))
+    if(props.rushee.fraternityInfo["FIJI"].bidStatus){
+      return(
+        <Button onClick={toggleBidStatus} variant="outline-danger" >Remove Bid</Button>
+      )
+    }else{
+      return(
+        <Button onClick={toggleBidStatus} variant="outline-success" >Give Bid</Button>
       )
     }
   }
@@ -302,6 +464,28 @@ function RusheeCard(props){
       </Modal>
     )
   }
+
+  const handleChangeRusheeInterest = () => {
+    console.log("CHANGE")
+    console.log(props)
+    var info = {'query': props.rushee.username}
+    fetch("http://127.0.0.1:8000/changeFratInterest", {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(info)
+  })
+  .then(respnse =>{
+    console.log(props)
+          props.getRushees()
+          // props.getOurRushees()
+      }
+  )
+
+  }
+
+
 
   const ViewAComment_Modal = () => {
     return(
@@ -369,35 +553,50 @@ function RusheeCard(props){
     )
   }
 
+
   return (
+    <div>
+      
+      {/* {((props.rushee.fraternityInfo["FIJI"].interested & props.ourRushees) || props.allRushees) && */}
     <Card style={{ width: '12rem' }}>
+      {console.log(props.rushee)}
       <Card.Img variant="top" src="holder.js/100px180" alt="Rushee Picture Here"/>
+      
       <Card.Body>
         <Card.Title>{props.rushee.first + " " + props.rushee.last}</Card.Title>
         <Card.Text>
-            {//TODO make this a drop down
-            props.rushee.major}
+            {props.rushee.major}
         </Card.Text>
         <Card.Text>
-          {props.rushee.reshall}
+          {props.rushee.housing}
         </Card.Text>
         <Card.Text>
-          Likes: {"NYI"}
+          Likes: {props.rushee.fraternityInfo["FIJI"].likes.length}
         </Card.Text>
         <div className="Rushee-Buttons">
           <Button variant="outline-dark " onClick={handleAddAComment}>Comment</Button>
           <Like_Button/>
+          <Bid_Button/>
           <Button variant="outline-dark" onClick={handleViewComments}>More Info</Button>
-          {props.accountType === "admin" &&
-          <Button variant="outline-dark" onClick={deleteRushee}>Delete Rushee</Button>
-      }
+          {props.accountType === "admin" && props.allRushees &&
+          <Button variant="outline-dark" onClick={deleteRushee}>Delete Rushee</Button>}
+          {props.accountType === "admin" && props.allRushees &&
+          <Button variant="outline-dark" disabled={props.rushee.fraternityInfo["FIJI"].interested} onClick={handleChangeRusheeInterest}>Add to Our List</Button>}
+          {props.accountType === "admin" && (props.ourRushees || props.rusheesWithBids) &&
+          <Button variant="outline-dark" onClick={handleChangeRusheeInterest}>Remove Rushee</Button>}
         </div>
       </Card.Body>
+      
       <LeaveAComment_Modal/>
       <ViewAComment_Modal/>
+    
     </Card>
+
+    </div>
+    
    
   );
+
 }
 
 
