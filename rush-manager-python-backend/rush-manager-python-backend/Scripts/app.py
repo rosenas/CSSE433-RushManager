@@ -560,7 +560,6 @@ def addRSVP():
 #   return {}
 
 def couchRSVP(eventName, username):
-  #type = add or remove
   if not db:
     return False
   getQuery = {'selector': {'$and': [{'type': 'event'}, {'name': eventName}]}}
@@ -569,10 +568,8 @@ def couchRSVP(eventName, username):
   for doc in res:
     data = doc
   if(username in doc['attended']):
-    #REMOVE
     data['attended'].remove(username)
   else:
-    #add it
     data['attended'].append(username)
   db.save(data)
 
