@@ -5,7 +5,20 @@ import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import Modal from 'react-bootstrap/Modal'
 import "../../CSS/index.css"
+import AWS from 'aws-sdk'
 
+const S3_BUCKET = 'rushee-images';
+const REGION = 'us-east-2';
+
+AWS.config.update({
+  accessKeyId: 'AKIA3OZ5F5ALHBCZERER',
+  secretAccessKey: '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'
+})
+
+const myBucket = new AWS.S3({
+  params: { Bucket: S3_BUCKET },
+  region: REGION,
+})
 
 
 function ViewRushees(props) {
@@ -37,6 +50,9 @@ function ViewRushees(props) {
         })
     }
 
+    const [progress, setProgress] = useState(0);
+    const [selectedFile, setSelectedFile] = useState(null);
+
     if(events.length == 0){
         getEvents()
     }
@@ -49,8 +65,31 @@ function ViewRushees(props) {
     'email': "",
     'major': "",
     'phone': "",
-    'housing': ""
+    'housing': "",
+    'photoURL': ""
   };
+  const handleFileInput = (e) => {
+    setSelectedFile(e.target.files[0]);
+  }
+
+
+  const uploadFile = (file) => {
+    doc.photoURL = "https://rushee-images.s3.us-east-2.amazonaws.com/" + encodeURIComponent(file.name)
+    const params = {
+      ACL: 'public-read',
+      Body: file,
+      Bucket: S3_BUCKET,
+      Key: file.name
+    };
+
+    myBucket.putObject(params)
+      .on('httpUploadProgress', (evt) => {
+        setProgress(Math.round((evt.loaded / evt.total) * 100))
+      })
+      .send((err) => {
+        if (err) console.log(err)
+      })
+  }
 
   const getRushees = () => {
     fetch('http://localhost:8000/getRushees', {
@@ -138,6 +177,7 @@ function ViewRushees(props) {
 
 
   const handleSubmit = () => {
+    uploadFile(photo)
     // console.log(doc)
     fetch("http://localhost:8000/addRushee", {
       method: 'POST',
@@ -185,8 +225,7 @@ function ViewRushees(props) {
               <label for="Event"><b>ResHall</b></label>
               <input type="text" placeholder="Enter Rushee Name" name="Rushee Name" onChange={e => doc.housing = e.target.value} required />
               <label for="Date"><b>Photo</b></label>
-              <input type="file" placeholder="Upload Photo" name="photo" onChange={e => handleSetPhoto(e.target.files[0])} required />
-            </div>
+              <input type="file" placeholder="Upload Photo" name="photo" onChange={e => handleSetPhoto(e.target.files[0])} required /> </div>
 
             <div className="Modal-Buttons">
               <Button variant="secondary" onClick={handleCancel}>Cancel</Button>
@@ -473,7 +512,7 @@ function RusheeCard(props) {
   return (
     <div>
       <Card style={{ width: '12rem' }}>
-        <Card.Img variant="top" src="holder.js/100px180" alt="Rushee Picture Here" />
+      <Card.Img class="rusheePhotos" variant="top" src={props.rushee.photoURL} alt="Rushee Picture Here" />
         <Card.Body>
           <Card.Title>{props.rushee.first + " " + props.rushee.last}</Card.Title>
           <Card.Text>

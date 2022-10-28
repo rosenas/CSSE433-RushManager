@@ -6,6 +6,7 @@ import time
 import bcrypt
 import json
 app = Flask(__name__)
+
 import couchdb
 couch = couchdb.Server('http://admin:couch@137.112.104.178:5984/')
 try:
@@ -120,7 +121,6 @@ def login():
 
   salt = bcrypt.gensalt()
   hash = bcrypt.hashpw("password".encode('utf-8'), salt)
-  print(hash)
   getQuery = {'selector': {'username': data.get('username')}}   
   res = db.find(getQuery)
   user = None
@@ -176,6 +176,9 @@ def getOurRushees():
 def addUser(data, type):
   salt = bcrypt.gensalt()
   hashed = bcrypt.hashpw(data.get("password").encode('utf-8'), salt).decode('utf-8')
+  try: 
+    photo = data.get('photoURL')
+  except: photo = None
   if(type == "brother"):
     doc = {
     "type": type,
@@ -189,6 +192,7 @@ def addUser(data, type):
     "fraternity": "FIJI",
     "username": data.get('username'),
     "phone": data.get('phone'),
+    "photoURL": data.get('photoURL')
   }
   else:
     doc = {
@@ -203,6 +207,7 @@ def addUser(data, type):
       "interestedInFIJI": False,
       "username": data.get('username'),
       "phone": data.get('phone'),
+      "photoURL": data.get('photoURL'),
       "fraternityInfo": {
         "FIJI":
         {

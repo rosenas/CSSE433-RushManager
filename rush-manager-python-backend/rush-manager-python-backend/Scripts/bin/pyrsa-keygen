@@ -1,0 +1,10 @@
+#!/bin/sh
+'''exec' "/Users/grant/Documents/CSSE 433/Rush Manager/CSSE433-RushManager/rush-manager-python-backend/rush-manager-python-backend/Scripts/bin/python3" "$0" "$@"
+' '''
+# -*- coding: utf-8 -*-
+import re
+import sys
+from rsa.cli import keygen
+if __name__ == '__main__':
+    sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])
+    sys.exit(keygen())
