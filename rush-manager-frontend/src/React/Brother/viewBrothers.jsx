@@ -9,8 +9,6 @@ import "../../CSS/index.css"
 
 
 function ViewBrothers(props){
-
-  console.log(props)
     const [brothers, setBrothers] = useState([])
     const [requestedBrothersList, setRequestedBrothersList] = useState([])
     const [ourBrothers, setOurBrothers] = useState(true)
@@ -24,6 +22,7 @@ function ViewBrothers(props){
     var doc = {'first': "",
           'last': "",
           'username': "",
+          'password': "",
           'email': "",
           'major': "",
           'phone': "",
@@ -128,6 +127,8 @@ function ViewBrothers(props){
                           <input type="text" placeholder="Enter Brother Name" name="Brother Name" onChange={e => doc.last = e.target.value} required />
                           <label for="Event"><b>Username</b></label>
                           <input type="text" placeholder="Enter Brother Name" name="Brother Name" onChange={e => doc.username = e.target.value} required />
+                          <label for="Event"><b>Password</b></label>
+                          <input type="text" placeholder="Password" name="Brother Name" onChange={e => doc.password = e.target.value} required />
                           <label for="Event"><b>Email</b></label>
                           <input type="text" placeholder="Enter Brother Name" name="Brother Name" onChange={e => doc.email = e.target.value} required />
                           <label for="Event"><b>Phone Number</b></label>

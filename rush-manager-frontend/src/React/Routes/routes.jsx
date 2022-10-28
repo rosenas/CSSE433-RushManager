@@ -16,22 +16,23 @@ function MyRouter(){
 
     const [token, setToken] = useState()
     const [accountType, setAccountType ] = useState()
+    const [accountInfo, setAccountInfo] = useState();
 
     console.log(accountType)
 
     if (token==='valid'){
         return(
-            <LoggedInRouter setToken={setToken}  accountType={accountType}/>
+            <LoggedInRouter setToken={setToken}  accountType={accountType} accountInfo={accountInfo}/>
         )
     }
     else{
-        return (<Login setToken={setToken} setAccountType={setAccountType}/>)
+        return (<Login setToken={setToken} setAccountType={setAccountType} setAccountInfo={setAccountInfo} />)
     }
 
 }
 
 
-function LoggedInRouter({accountType, setToken }){
+function LoggedInRouter({accountType, setToken, accountInfo }){
 
 
 
@@ -50,19 +51,19 @@ function LoggedInRouter({accountType, setToken }){
                     <Button className="LogOut_Button" onClick={handleLogOut}>Log out</Button>
                 </div>
                  <Routes>
-                    <Route path="/rushEvents" element={<RushEvents_Brother accountType = "admin"/>}/>
+                    <Route path="/rushEvents" element={<RushEvents_Brother accountInfo= {accountInfo} accountType = {"admin"}/>}/>
 
-                    <Route path="/viewRushees" element={<ViewRushees accountType = {"admin"}/>}/>
+                    <Route path="/viewRushees" element={<ViewRushees accountInfo= {accountInfo} accountType = {"admin"}/>}/>
 
-                    <Route path="/viewBrothers" element={<ViewBrothers accountType = {"admin"}/>}/>
+                    <Route path="/viewBrothers" element={<ViewBrothers accountInfo= {accountInfo} accountType = {"admin"}/>}/>
 
-                    <Route path= "*" element={<ViewRushees accountType = {"admin"}/>}/>
+                    <Route path= "*" element={<ViewRushees accountInfo= {accountInfo} accountType = {"admin"}/>}/>
                 </Routes>
             </Router>
            
         )
     }
-    else if(accountType == "Rushee"){
+    else if(accountType == "rushee"){
         return (
             <Router>
                 <div className="Navigation">
@@ -70,18 +71,18 @@ function LoggedInRouter({accountType, setToken }){
                     <Button className="LogOut_Button" onClick={handleLogOut}>Log out</Button>
                 </div>
                 <Routes>
-                    <Route path="/rushEvents" element={<RushEvents/>}/>
+                    <Route path="/rushEvents" element={<RushEvents accountInfo= {accountInfo} accountType = {"rushee"}/>}/>
 
-                    <Route path="/contact" element={<Contact/>}/>
+                    <Route path="/contact" element={<Contact accountInfo= {accountInfo} accountType = {"rushee"}/>}/>
 
-                    <Route path="/viewBrothers" element={<ViewBrothers accountType = {"rushee"}/>}/>
+                    <Route path="/viewBrothers" element={<ViewBrothers accountInfo= {accountInfo} accountType = {"rushee"}/>}/>
 
-                    <Route path= "*" element={<RushEvents/>}/>
+                    <Route path= "*" element={<RushEvents accountType = {"rushee"} accountInfo= {accountInfo}/>}/>
                 </Routes>
             </Router>
         )
     }
-    else if (accountType == "Brother"){
+    else if (accountType == "brother"){
 
         
         
@@ -92,13 +93,13 @@ function LoggedInRouter({accountType, setToken }){
                     <Button className="LogOut_Button" onClick={handleLogOut}>Log out</Button>
                 </div>
                  <Routes>
-                    <Route path="/rushEvents" element={<RushEvents_Brother accountType = "brother"/>}/>
+                    <Route path="/rushEvents" element={<RushEvents_Brother accountInfo= {accountInfo} accountType = {"brother"}/>}/>
 
-                    <Route path="/viewRushees" element={<ViewRushees accountType = {"brother"}/>}/>
+                    <Route path="/viewRushees" element={<ViewRushees accountInfo= {accountInfo} accountType = {"brother"}/>}/>
 
-                    <Route path="/viewBrothers" element={<ViewBrothers accountType = {"brother"}/>}/>
+                    <Route path="/viewBrothers" element={<ViewBrothers accountInfo= {accountInfo} accountType = {"brother"}/>}/>
 
-                    <Route path= "*" element={<ViewRushees accountType = {"brother"}/>}/>
+                    <Route path= "*" element={<ViewRushees accountInfo= {accountInfo} accountType = {"brother"}/>}/>
                 </Routes>
             </Router>
            

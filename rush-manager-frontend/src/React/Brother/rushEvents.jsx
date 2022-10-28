@@ -7,7 +7,7 @@ import 'react-bootstrap';
 import "../../CSS/index.css"
 
 
-function RushEvents(){
+function RushEvents(props){
 
     const [events, setEvents] = useState([])
     const [eventName, setEventName] = useState()
@@ -128,10 +128,9 @@ function RushEvents(){
 
     return (
         <>
-        
         <h1 className="title">Rush Events</h1>
         <div className="container">
-            {events && events.map((rushee) => <RushEvent event={rushee}/>)}
+            {events && events.map((rushee) => <RushEvent getEvents={getEvents} accountType={props.accountType} event={rushee}/>)}
         </div>
         <div className= "add">
             <Button variant="light" onClick={handleAddRushEvent}>Add Rush Event</Button>
@@ -145,6 +144,21 @@ function RushEvents(){
 function RushEvent(props){
 
     const [moreInfo, setMoreInfo] = useState(false)
+
+    const handleDeleteEvent = () => {
+        let data = {"name": props.event.name}
+        fetch("http://localhost:8000/deleteEvent", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+            .then(data => {
+                props.getEvents()
+            })
+    }
 
     const handleMoreInfo = () => {
         setMoreInfo(true)
@@ -164,14 +178,15 @@ function RushEvent(props){
                         <table>
                             <tbody>
                             <tr>
-                                <th>Rushee Name</th>
-                                <th>Likes</th>
+                                <th>Rushees Attending: {props.event.attended.length}</th>
+                                
                             </tr>
-                                {props.event.attending && props.event.attending.map((rushee) => {
+                                {props.event.attended && props.event.attended.map((rushee) => {
                                     return (
                                         <tr>
-                                            <td>{rushee.name}</td>
-                                            <td>{rushee.likes}</td>
+
+                                            <td>{rushee}</td>
+                                            
                                             
                                         </tr>
                                     )
@@ -188,6 +203,7 @@ function RushEvent(props){
     }
 
     return (
+
         <Card style={{ width: '12rem' }}>
             <Card.Body>
                 <Card.Title>{props.event.name}</Card.Title>
@@ -195,6 +211,8 @@ function RushEvent(props){
                     {props.event.date}
                 </Card.Text>
                 <Button className="add_button" onClick={handleMoreInfo} variant="outline-info">More Info</Button>
+                {props.accountType === "admin" &&
+                <Button className="add_button" onClick={handleDeleteEvent} variant="outline-info">Delete Event</Button>}
             </Card.Body>
             <MoreInfo_Modal/>
         </Card>

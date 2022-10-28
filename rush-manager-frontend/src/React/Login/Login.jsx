@@ -4,48 +4,60 @@ import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
 
 
-function Login({ setToken, setAccountType }) {
+function Login({ setToken, setAccountType, setAccountInfo }, {}) {
 
     const [username, setUsername] = useState();
     const [password, setPassword] = useState();
+    const [loginRes, setLoginRes] = useState();
 
     const handleSubmit = async e => {
         e.preventDefault();
-
+        console.log(password)
+        let result = ""
         //check to verify login
 
+        doc = {password: password, username: username}
         
-        fetch("http://localhost:8000/login", {
+        await fetch("http://localhost:8000/login", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
+            body: JSON.stringify(doc)
         })
-        .then((response) => response.json())
-        .then((data) => {
+        .then(response => response.json())
+        .then(data => {
+            result = data
+            setAccountInfo(data)
             
         })
+        console.log(result)
+        if(result.result) {
+            setToken("valid")
+            setAccountType(result.accountType)
+            console.log(result.username)
+        }
 
-        if (username == "b") {
-            setToken("valid")
-            setAccountType("Brother")
-        }
-        else if (username == "r") {
-            setToken("valid")
-            setAccountType("Rushee")
-        }
-        else if (username == "a") {
-            setToken("valid")
-            setAccountType("Admin")
-        }
-        else if (username == "reqB") {
-            setToken("valid")
-            setAccountType("ReqB")
-        }
-        else if (username == "ReqR") {
-            setToken("valid")
-            setAccountType("ReqR")
-        }
+        // if (username == "b") {
+        //     setToken("valid")
+        //     setAccountType("Brother")
+        // }
+        // else if (username == "r") {
+        //     setToken("valid")
+        //     setAccountType("Rushee")
+        // }
+        // else if (username == "a") {
+        //     setToken("valid")
+        //     setAccountType("Admin")
+        // }
+        // else if (username == "reqB") {
+        //     setToken("valid")
+        //     setAccountType("ReqB")
+        // }
+        // else if (username == "ReqR") {
+        //     setToken("valid")
+        //     setAccountType("ReqR")
+        // }
 
 
 
@@ -81,6 +93,7 @@ function Login({ setToken, setAccountType }) {
             'accountType': "",
           'last': "",
           'username': "",
+          'password': "",
           'email': "",
           'major': "",
           'phone': "",
@@ -122,7 +135,7 @@ function Login({ setToken, setAccountType }) {
                             <input type="text" placeholder="Username" name="Username" onChange={e => doc.username = e.target.value} />
 
                             <label for="Password"><b>Password</b></label>
-                            <input type="password" placeholder="Password" name="Password"required />
+                            <input type="password" placeholder="Password" name="Password"required onChange={e => doc.password = e.target.value}/>
                             <label for="AccountType"><b>Account Type</b></label>
                             <input type="text" placeholder="Account Type" name="AccountType" onChange={e => doc.accountType = e.target.value} />
                             <label for="First"><b>First Name</b></label>

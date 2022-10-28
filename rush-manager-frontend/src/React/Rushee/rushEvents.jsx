@@ -7,12 +7,14 @@ import "../../CSS/index.css"
 
 
 
-function RushEvents(){
+function RushEvents(props){
+  console.log("PROPS")
+  console.log(props.accountInfo.username)
 
     const [events, setEvents] = useState([])
 
-    if(events.length == 0){
-        fetch('http://localhost:8000/getEvents',{
+    const getEvents = () => {
+      fetch('http://localhost:8000/getEvents',{
             headers : { 
             'Content-Type': 'application/json',
             'Accept': 'application/json'
@@ -26,11 +28,15 @@ function RushEvents(){
         })
     }
 
+    if(events.length == 0){
+        getEvents()
+    }
+
     return (
         <>
         <h1 className="title">Rush Events</h1>
         <div className="container">
-            {events && events.map((rushee) => <RushEvent rushee={rushee}/>)}
+            {events && events.map((event) => <RushEvent getEvents = {getEvents} props = {props} event={event}/>)}
         </div>
         
         </>
@@ -39,39 +45,61 @@ function RushEvents(){
 }
 
 function RushEvent(props){
-
+  
   const [rsvp, setRSVP] = useState(false)
 
-    const handleRSVP = () => {
-        setRSVP(true)
-    }
+    
 
-    const handleUnRSVP = () => {
-        setRSVP(false)
+    const handleRSVP = () => {
+      var info = { 'username': props.props.accountInfo.username, 'event': props.event.name }
+      fetch("http://localhost:8000/changeRSVP", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(info)
+      })
+        .then(respnse => {
+          props.getEvents()
+        }
+        )
     }
 
     const RSVP_Button = () => {
-        if(rsvp){
-          return(
-            <Button onClick={handleUnRSVP} variant="outline-danger">Un-RSVP</Button>
-          )
+      let username = (props.props.accountInfo.username)
+      // console.log(.username)
+      // console.log(username)
+      let rsvped = props.event.attended.includes(username)
+      if (rsvped) {
+        return (
+          <Button onClick={handleRSVP} variant="outline-danger" >Un RSVP</Button>
+        )
+      } else {
+        return (
+          <Button onClick={handleRSVP} variant="outline-success" >RSVP</Button>
+        )
+      }
+        // if(rsvp){
+        //   return(
+        //     <Button onClick={handleUnRSVP} variant="outline-danger">Un-RSVP</Button>
+        //   )
           
-        }
-        else{
-          return(
-            <Button onClick={handleRSVP} variant="outline-success">RSVP</Button>
-          )
+        // }
+        // else{
+        //   return(
+        //     <Button onClick={handleRSVP} variant="outline-success">RSVP</Button>
+        //   )
           
-        }
+        // }
     }
 
 
   return (
     <Card style={{ width: '12rem' }}>
       <Card.Body>
-        <Card.Title>{props.rushee.name}</Card.Title>
+        <Card.Title>{props.event.name}</Card.Title>
         <Card.Text>
-            {props.rushee.date}
+            {props.event.date}
             <div>
               <RSVP_Button />
             </div>

@@ -17,8 +17,6 @@ app.use(cors(corsOptions)) // Use this after the variable declaration
 app.use(express.static(path.join(__dirname, '/public')))
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
-
-
   //how you call app.py
   request('http://127.0.0.1:5000/', {
     json: true
@@ -26,8 +24,6 @@ app.listen(port, () => {
     if (err) {
       return console.log(err);
     }
-    
-    console.log(body);
   });
     
   })
@@ -70,7 +66,6 @@ app.get("/getEvents", async (req, res1) => {
       return console.log(err);
     }
     res1.send(body)
-    console.log(body);
   });
 })
 
@@ -78,6 +73,20 @@ app.post("/addEvent", (req, res1) => {
   let data = {"name": req.body.name,
               "date": req.body.date}
   request.post('http://127.0.0.1:5000/addEvent', {
+    json: true,
+    body: data
+  }, (err, res, body) => {
+    if (err) {
+      return console.log(err);
+    }
+    res1.send(body)
+  });
+
+})
+
+app.post("/deleteEvent", (req, res1) => {
+  let data = {"name": req.body.name}
+  request.post('http://127.0.0.1:5000/deleteEvent', {
     json: true,
     body: data
   }, (err, res, body) => {
@@ -220,17 +229,50 @@ app.post("/changeBid", (req, res1) => {
 
 })
 
+app.post("/changeRSVP", (req, res1) => {
+  request.post('http://127.0.0.1:5000/changeRSVP', {
+    json: true,
+    body: req
+  }, (err, res, body) => {
+    if (err) {
+      return console.log(err);
+    }
+    res1.send("Changed")
+  });
+
+})
+
 app.post("/createAccount", (req, res) => {
   
 })
 
-app.post("/login", (req, res) => {
-  
+app.post("/login", (req, res1) => {
+  console.log(req)
+  request.post('http://127.0.0.1:5000/login', {
+    json: true,
+    body: req
+  }, (err, res, body) => {
+    if (err) {
+      return console.log(err);
+    }
+    res1.send(body)
+  });
 })
 
-app.post("/comment", (req, res) => {
-  
+app.post("/addComment", (req, res1) => {
+  console.log(req)
+  request.post('http://127.0.0.1:5000/addComment', {
+    json: true,
+    body: req
+  }, (err, res, body) => {
+    if (err) {
+      return console.log(err);
+    }
+    res1.send(body)
+  });
 })
+
+
 
 app.post("/like", (req, res) => {
   
