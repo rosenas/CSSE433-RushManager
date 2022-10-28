@@ -1,7 +1,9 @@
 from hashlib import new
+from pickle import NONE
 from flask import request
 from flask import Flask
 import time
+import bcrypt
 import json
 app = Flask(__name__)
 import couchdb
@@ -11,6 +13,7 @@ try:
 except:
   db = None
   print("couch down")
+
 
 
 def queue(action):
@@ -71,20 +74,14 @@ def readQueue():
             newFile.append(line)
           else:
             newFile.append(line)
-        elif(split[1] == "addRSVP"):
-          res = couchRSVP("add", (split[2]).strip(), split[3].strip())
+        elif(split[1] == "changeRSVP"):
+          res = couchRSVP((split[2]).strip(), split[3].strip())
           if res:
             line = "DONE%&%" + split[1] + "%&%" + split[2] + "%&%" + split[3] 
             newFile.append(line)
           else:
             newFile.append(line)
-        elif(split[1] == "removeRSVP"):
-          res = couchRSVP("delete", (split[2]).strip(), split[3].strip())
-          if res:
-            line = "DONE%&%" + split[1] + "%&%" + split[2] + "%&%" + split[3] 
-            newFile.append(line)
-          else:
-            newFile.append(line)
+        
         
 
       else: #already done
@@ -102,6 +99,41 @@ def readQueue():
 def hello():
   #queue("Connected")
   return "Connected to python!"
+
+
+
+@app.route("/login", methods = ['POST'])
+def login():
+  #admin, password
+
+  #hashedPass = b'$2b$12$6hTNWdMElHpFGqLWJDo3cOp2SuYmg1d6ft54naXiS67/3cJeM6ky6'
+  #from a rush chairs "add rushee button"
+  data = ""
+  #print("Logging in")
+  password = ""
+  if request.method == 'POST':
+    data = request.get_json().get('body')
+    #print(data)
+    #print(data.get('username'))
+    #print(data.get('password'))
+    password = data.get('password').encode('utf-8')
+
+  salt = bcrypt.gensalt()
+  hash = bcrypt.hashpw("password".encode('utf-8'), salt)
+  print(hash)
+  getQuery = {'selector': {'username': data.get('username')}}   
+  res = db.find(getQuery)
+  user = None
+  for doc in res:
+    user = doc
+  if(user):
+    userHashedPass = user['password'].encode('utf-8')
+    res = bcrypt.checkpw(password, userHashedPass)
+    #print(res)
+    return {'result': res, 'accountType': user['type'], 'username': user['username']}
+  else:
+    return {'result': False, 'accountType': "", 'username': "", 'message': "No user found."}
+  #return {'result': res, 'accountType': "Admin", 'username': "rippy"}
 
 @app.route("/createUser", methods = ['POST'])
 def createUser():
@@ -142,6 +174,8 @@ def getOurRushees():
   return data
 
 def addUser(data, type):
+  salt = bcrypt.gensalt()
+  hashed = bcrypt.hashpw(data.get("password").encode('utf-8'), salt).decode('utf-8')
   if(type == "brother"):
     doc = {
     "type": type,
@@ -149,6 +183,7 @@ def addUser(data, type):
     "last": data.get('last'),
     "email": data.get('email'),
     "major": data.get('major'),
+    "password": hashed,
     "housing": data.get('housing'),
     "interests": [],
     "fraternity": "FIJI",
@@ -162,6 +197,7 @@ def addUser(data, type):
       "last": data.get('last'),
       "email": data.get('email'),
       "major": data.get('major'),
+      "password": hashed,
       "housing": data.get('housing'),
       "interests": [],
       "interestedInFIJI": False,
@@ -183,7 +219,9 @@ def addUser(data, type):
   if(type == "requestedRushee"):
     doc['type'] = "rushee"
     doc['fraternityInfo']["FIJI"]['interested'] = False
-
+  elif(type == "requestedBrother"):
+    doc['type'] = "requestedBrother"
+    doc['fraternityInfo']["FIJI"]['interested'] = False
   queue("TODO%&%" + "addUser%&%" + json.dumps(doc))
   return True
 
@@ -432,17 +470,23 @@ def needsDiscussion():
     doc['fraternityInfo']["FIJI"]['needsDiscussion'] = not doc['fraternityInfo']["FIJI"]['needsDiscussion']
     db.save(doc)
 
-@app.route("/addComment")
+@app.route("/addComment", methods = ['POST'])
 def addComment():
   #need rushee's username, comment, username of brther who left comment
   inp = ""
-  comment = ""
-  rusheeQuery = {'selector': {'$and': [{'type': 'rushee'}, {'$or': [{'email': inp}, {'username': inp}]}]}}
+  if request.method == 'POST':
+    inp = request.get_json().get('body')
+  rusheeQuery = {'selector': {'$and': [{'type': 'rushee'}, {'username': inp.get('rushee')}]}}
   res = db.find(rusheeQuery)
+  comment = {'comment': inp.get('comment'), 'user': inp.get('user')}
   for row in res:
     doc = db.get(row.id)
     doc['fraternityInfo']["FIJI"]['comments'].append(comment)
     db.save(doc)
+    print(doc)
+
+  return {}
+
 
 @app.route("/getInterestedIn")
 def getInterestedIn():
@@ -495,38 +539,43 @@ def couchAddEvent(name, date):
   res = db.save(doc)
   return True
 
-@app.route("/addRSVP", methods = ['POST'])
+@app.route("/changeRSVP", methods = ['POST'])
 def addRSVP():
+  data = ""
   
   if request.method == 'POST':
-    data = request.get_json()
+    data = request.get_json().get('body')
+  print(data)
 
-  queue("TODO%&%addRSVP%&%" + data["eventName"] + "%&%" + data["username"])
+  queue("TODO%&%changeRSVP%&%" + data["event"] + "%&%" + data["username"])
   return {}
 
-@app.route("/removeRSVP", methods = ['POST'])
-def removeRSVP():
+# @app.route("/removeRSVP", methods = ['POST'])
+# def removeRSVP():
   
-  if request.method == 'POST':
-    data = request.get_json()
+#   if request.method == 'POST':
+#     data = request.get_json()
 
-  queue("TODO%&%removeRSVP%&%" + data["eventName"] + "%&%" + data["username"])
-  return {}
+#   queue("TODO%&%removeRSVP%&%" + data["eventName"] + "%&%" + data["username"])
+#   return {}
 
-def couchRSVP(type, eventName, username):
+def couchRSVP(eventName, username):
   #type = add or remove
   if not db:
     return False
+  getQuery = {'selector': {'$and': [{'type': 'event'}, {'name': eventName}]}}
+  res = db.find(getQuery)
+  data = ""
+  for doc in res:
+    data = doc
+  if(username in doc['attended']):
+    #REMOVE
+    data['attended'].remove(username)
+  else:
+    #add it
+    data['attended'].append(username)
+  db.save(data)
 
-  if(type == "delete"):
-    #dlete rsvp from event
-    None
-  elif(type == "add"):
-    #add rsvp to event
-    None
-  None
-
-  #TODO : Implement adding rsvp
   return True
 
 
