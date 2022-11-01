@@ -1,0 +1,4 @@
+
+        [console_scripts]
+        awesome=search_cli.awesome_search:main
+    

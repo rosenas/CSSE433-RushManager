@@ -2,10 +2,24 @@ from hashlib import new
 from pickle import NONE
 from flask import request
 from flask import Flask
+
+# from redisearch import Client
+
 import time
+import redis 
+# from redisearch import Client, TextField, NumericField, FT
+import redis 
 import bcrypt
 import json
 app = Flask(__name__)
+
+# client = Client('myIndex')
+# FT.CREATE(idx:movie ON hash PREFIX 1 "movie:" SCHEMA title TEXT SORTABLE)
+# client.create_index([TextField('title', weight=5.0), TextField('body')])
+# client.add_document('doc1', title = 'RediSearch', body = 'Redisearch impements a search engine on top of redis')
+# res = client.search("search engine")
+
+# print(res.total)
 
 import couchdb
 couch = couchdb.Server('http://admin:couch@137.112.104.178:5984/')
@@ -15,7 +29,11 @@ except:
   db = None
   print("couch down")
 
+redis = redis.Redis()
+redisRusheeHash = "rusheeHash"
+redisBrotherHash = "brotherHash"
 
+# client = Client("my-index")
 
 def queue(action):
   with open("queue.txt", "a") as f:
@@ -82,7 +100,38 @@ def readQueue():
             newFile.append(line)
           else:
             newFile.append(line)
-        
+      elif(split[0] == "REDIS"):
+        if(split[1] == "addAsUser"):
+          if(split[2] == "rushee"):
+         
+            res = redisAddRushee(split[3], split[4].replace("\n", ""))
+            if res:
+              line = "DONE%&%" + split[1] + "%&%" + split[2] + "%&%" + split[3] + "%&%" + split[4]
+              newFile.append(line)
+            else:
+              newFile.append(line)
+          elif(split[2] == "brother"):
+            res = redisAddBrother(split[3], split[4].replace("\n", ""))
+            if res:
+              line = "DONE%&%" + split[1] + "%&%" + split[2] + "%&%" + split[3] + "%&%" + split[4]
+              newFile.append(line)
+            else:
+              newFile.append(line)
+        elif(split[1] == "delUser"):
+          if(split[2] == "rushee"):
+            res = redisDeleteRushee(split[3].replace("\n", ""))
+            if res:
+              line = "DONE%&%" + split[1] + "%&%" + split[2] + "%&%" + split[3]
+              newFile.append(line)
+            else:
+              newFile.append(line)
+          elif(split[2] == "brother"):
+            res = redisDeleteBrother(split[3].replace("\n", ""))
+            if res:
+              line = "DONE%&%" + split[1] + "%&%" + split[2] + "%&%" + split[3]
+              newFile.append(line)
+            else:
+              newFile.append(line)
         
 
       else: #already done
@@ -101,22 +150,75 @@ def hello():
   #queue("Connected")
   return "Connected to python!"
 
+def redisAddBrother(name, username):
+  redis.hset(redisBrotherHash, name, username)
+  redisGetBrothers()
+  return True
 
+def redisDeleteBrother(name):
+  redis.hdel(redisBrotherHash, name)
+  redisGetBrothers()
+  return True
+
+def redisGetBrothers():
+  print("getting redis brothers")
+  brothers = redis.hgetall(redisBrotherHash)
+  print(brothers)
+
+def redisAddRushee(name, username):
+  print(name, username)
+  #queue("REDIS%&%addAsUser%&%rushee%&%" + name + "%&%" + username)
+  redis.hset(redisRusheeHash, name, username)
+  redisGetRushees()
+  return True
+
+def redisDeleteRushee(name):
+  print(name)
+  redis.hdel(redisRusheeHash, name)
+  redisGetRushees()
+  return True
+
+def redisGetRushees():
+  print("getting redis rushees")
+  rushees = redis.hgetall(redisRusheeHash)
+  print(rushees)
+
+@app.route("/searchRushee", methods = ['POST'])
+def redisSearch():
+  if request.method == 'POST':
+    data = request.get_json().get('body')
+    
+  name = data.get('body')
+  print(name)
+
+  # name = data.get('first') + " " + data.get('last')
+  try:
+    rushee = redis.hget(redisRusheeHash, name).decode('utf-8')
+    userQuery = {'selector': {'username': rushee}}
+    res = db.find(userQuery)
+    data = []
+    for item in res:
+      data.append(item)
+    print(data)
+    return data
+
+  except:
+    return []
+  
+  
+  
 
 @app.route("/login", methods = ['POST'])
 def login():
-  #admin, password
-
-  #hashedPass = b'$2b$12$6hTNWdMElHpFGqLWJDo3cOp2SuYmg1d6ft54naXiS67/3cJeM6ky6'
-  #from a rush chairs "add rushee button"
+  # redisAddRushee("Jared", "Petrisko")
+  #queue("REDIS%&%addAsUser%&%rushee%&%" + "jake" + "%&%" + "jakey1")
+  
+  redisGetRushees()
+  redisGetBrothers()
   data = ""
-  #print("Logging in")
   password = ""
   if request.method == 'POST':
     data = request.get_json().get('body')
-    #print(data)
-    #print(data.get('username'))
-    #print(data.get('password'))
     password = data.get('password').encode('utf-8')
 
   salt = bcrypt.gensalt()
@@ -129,11 +231,9 @@ def login():
   if(user):
     userHashedPass = user['password'].encode('utf-8')
     res = bcrypt.checkpw(password, userHashedPass)
-    #print(res)
     return {'result': res, 'accountType': user['type'], 'username': user['username']}
   else:
     return {'result': False, 'accountType': "", 'username': "", 'message': "No user found."}
-  #return {'result': res, 'accountType': "Admin", 'username': "rippy"}
 
 @app.route("/createUser", methods = ['POST'])
 def createUser():
@@ -193,8 +293,10 @@ def addUser(data, type):
     "username": data.get('username'),
     "phone": data.get('phone'),
     "photoURL": data.get('photoURL')
-  }
-  else:
+    }
+    queue("REDIS%&%addAsUser%&%brother%&%" + data.get('first') + " " + data.get('last') + "%&%" + data.get('username'))
+
+  elif(type == "rushee"):
     doc = {
       "type": type,
       "first": data.get('first'),
@@ -221,6 +323,7 @@ def addUser(data, type):
         }
       }
     }
+    queue("REDIS%&%addAsUser%&%rushee%&%" + data.get('first') + " " + data.get('last') + "%&%" + data.get('username'))
   if(type == "requestedRushee"):
     doc['type'] = "rushee"
     doc['fraternityInfo']["FIJI"]['interested'] = False
@@ -228,6 +331,7 @@ def addUser(data, type):
     doc['type'] = "requestedBrother"
     doc['fraternityInfo']["FIJI"]['interested'] = False
   queue("TODO%&%" + "addUser%&%" + json.dumps(doc))
+  
   return True
 
 @app.route("/addRushee", methods = ['POST'])
@@ -238,9 +342,6 @@ def addRushee():
   if request.method == 'POST':
     data = request.get_json().get('body')
   addUser(data, "rushee")
-  #queue("TODO%&%changeUserType%&%rushee%&%" + data.get('username'))
-  
-  
   return "Rushee added"
 
 
@@ -253,8 +354,6 @@ def addAsBrother():
     data = request.get_json().get('body')
   print(data)
   queue("TODO%&%changeUserType%&%brother%&%" + data.get('username'))
-  
-  
   return "Rushee added"
 
 
@@ -282,9 +381,13 @@ def deleteRushee():
 
   data = ""
   if request.method == 'POST':
-    data = request.get_json().get('body').get('query')
+    data = request.get_json().get('body')
   # searchInput = ""
-  queue("TODO%&%" + "deleteRushee%&%" + data)
+  print(data)
+  query = data.get('query') #username
+  queue("TODO%&%" + "deleteRushee%&%" + query)
+  queue("REDIS%&%delUser%&%rushee%&%" + data.get('first') + " " + data.get('last'))
+
   
   return "Rushee deleted"
 
@@ -321,19 +424,16 @@ def addBrother():
   if request.method == 'POST':
     data = request.get_json().get('body')
   addUser(data, "brother")
-  
   return "Brother added"
 
 
 @app.route("/deleteBrother", methods = ['POST'])
 def deleteBrother():
-
   data = ""
   if request.method == 'POST':
     data = request.get_json().get('body').get('query')
-  # searchInput = ""
   queue("TODO%&%" + "deleteBrother%&%" + data)
-  
+  queue("REDIS%&%delUser%&%brother%&%" + data.get('first') + " " + data.get('last'))
   return "Brother deleted"
 
 
@@ -389,7 +489,7 @@ def searchRushee():
 
 @app.route("/changeFratInterest", methods = ['POST'])
 def changeFratInterest():
-  #TODO add to queu
+  #TODO add to queue
   inp = ""
   if request.method == 'POST':
     inp = request.get_json().get('body').get('query')
@@ -404,7 +504,7 @@ def changeFratInterest():
 
 @app.route("/likeRushee", methods = ['POST'])
 def likeRushee():
-  #TODO add to queu
+  #TODO add to queue
   inp = ""
   if request.method == 'POST':
     inp = request.get_json().get('body')
@@ -421,7 +521,7 @@ def likeRushee():
 
 @app.route("/dislikeRushee", methods = ['POST'])
 def dislikeRushee():
-  #TODO add to queu
+  #TODO add to queue
   inp = ""
   if request.method == 'POST':
     inp = request.get_json().get('body')
@@ -440,7 +540,7 @@ def dislikeRushee():
 
 @app.route("/changeBid", methods = ['POST'])
 def changeBid():
-  #TODO add to queu
+  #TODO add to queue
   inp = ""
   if request.method == 'POST':
     inp = request.get_json().get('body')
@@ -454,6 +554,7 @@ def changeBid():
 
 @app.route("/addRating")
 def addRating():
+  #we dont use this on the front end yet 
   #need rushee's username, rating
   inp = ""
   rating = ""
@@ -466,6 +567,7 @@ def addRating():
 
 @app.route("/needsDiscussion")
 def needsDiscussion():
+  #we dont use this on the front end yet 
   #need rushee's username
   inp = ""
   rusheeQuery = {'selector': {'$and': [{'type': 'rushee'}, {'$or': [{'email': inp}, {'username': inp}]}]}}
@@ -477,6 +579,7 @@ def needsDiscussion():
 
 @app.route("/addComment", methods = ['POST'])
 def addComment():
+  #TODO add to queue
   #need rushee's username, comment, username of brther who left comment
   inp = ""
   if request.method == 'POST':
@@ -493,14 +596,14 @@ def addComment():
   return {}
 
 
-@app.route("/getInterestedIn")
-def getInterestedIn():
-  #returns all rushees a frat is interested in
-  findRushees = {'selector': {'$and': [{'type': 'rushee'}, {'fraternityInfo': {"FIJI": {'interested':True}}}]}}
-  res = db.find(findRushees)
-  for doc in res:
-    print(doc)
-  return "All rushees FIJI is interested in"
+# @app.route("/getInterestedIn")
+# def getInterestedIn():
+#   #returns all rushees a frat is interested in
+#   findRushees = {'selector': {'$and': [{'type': 'rushee'}, {'fraternityInfo': {"FIJI": {'interested':True}}}]}}
+#   res = db.find(findRushees)
+#   for doc in res:
+#     print(doc)
+#   return "All rushees FIJI is interested in"
 
 @app.route("/changeRusheeInterest")
 def changeRusheeInterest():
@@ -554,15 +657,6 @@ def addRSVP():
 
   queue("TODO%&%changeRSVP%&%" + data["event"] + "%&%" + data["username"])
   return {}
-
-# @app.route("/removeRSVP", methods = ['POST'])
-# def removeRSVP():
-  
-#   if request.method == 'POST':
-#     data = request.get_json()
-
-#   queue("TODO%&%removeRSVP%&%" + data["eventName"] + "%&%" + data["username"])
-#   return {}
 
 def couchRSVP(eventName, username):
   if not db:

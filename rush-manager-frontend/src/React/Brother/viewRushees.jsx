@@ -177,7 +177,7 @@ function ViewRushees(props) {
 
 
   const handleSubmit = () => {
-    uploadFile(photo)
+    // uploadFile(photo)
     // console.log(doc)
     fetch("http://localhost:8000/addRushee", {
       method: 'POST',
@@ -224,8 +224,22 @@ function ViewRushees(props) {
               <input type="text" placeholder="Enter Rushee Name" name="Rushee Name" onChange={e => doc.major = e.target.value} required />
               <label for="Event"><b>ResHall</b></label>
               <input type="text" placeholder="Enter Rushee Name" name="Rushee Name" onChange={e => doc.housing = e.target.value} required />
-              <label for="Date"><b>Photo</b></label>
-              <input type="file" placeholder="Upload Photo" name="photo" onChange={e => handleSetPhoto(e.target.files[0])} required /> </div>
+              <div>
+                <h4>Please select your interests:</h4>
+                <div>
+              <Button onClick={handleCancel}>Button</Button>
+              <Button onClick={handleCancel}>Button</Button>
+              <Button onClick={handleCancel}>Button</Button>
+              </div>
+              <div>
+              <Button onClick={handleCancel}>Button</Button>
+              <Button onClick={handleCancel}>Button</Button>
+              <Button onClick={handleCancel}>Button</Button>
+              </div>
+              </div>
+              {/* <label for="Date"><b>Photo</b></label>
+              <input type="file" placeholder="Upload Photo" name="photo" onChange={e => handleSetPhoto(e.target.files[0])} required />  */}
+              </div>
 
             <div className="Modal-Buttons">
               <Button variant="secondary" onClick={handleCancel}>Cancel</Button>
@@ -347,7 +361,7 @@ function RusheeCard(props) {
   }
 
   const deleteRushee = () => {
-    var info = { 'query': props.rushee.username }
+    var info = { 'query': props.rushee.username, 'first':props.rushee.first, 'last': props.rushee.last }
     fetch("http://localhost:8000/deleteRushee", {
       method: 'POST',
       headers: {

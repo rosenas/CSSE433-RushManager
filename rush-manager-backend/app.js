@@ -43,6 +43,7 @@ app.get("/getRushees", async (req, res1) => {
     }
     res1.send(body)
   });
+  
 })
 
 app.get("/getBrothers", async (req, res1) => {
@@ -79,6 +80,23 @@ app.post("/addEvent", (req, res1) => {
     if (err) {
       return console.log(err);
     }
+    res1.send(body)
+  });
+
+})
+
+
+app.post("/searchRushee", (req, res1) => {
+  console.log(req)
+  request.post('http://127.0.0.1:5000/searchRushee', {
+    json: true,
+    body: req
+  }, (err, res, body) => {
+    if (err) {
+      return console.log(err);
+    }
+    console.log("LJDB")
+    console.log(body)
     res1.send(body)
   });
 

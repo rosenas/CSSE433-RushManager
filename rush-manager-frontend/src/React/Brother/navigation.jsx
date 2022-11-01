@@ -3,12 +3,29 @@ import Nav from "react-bootstrap/Nav"
 import { NavLink } from "react-router-dom";
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
-
+import { useState } from 'react';
 
 function Navigation(props){
 
+    let searchValue = ""
+
+    const [search, setSearch] = useState([])
     const handleSearch = () => {
-        
+    console.log(searchValue)
+    let data = {'body': searchValue}
+    fetch("http://127.0.0.1:8000/searchRushee", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data)
+    })
+      .then(response => response.json())
+      .then(data=>{
+          console.log("res");
+          setSearch(data)
+          console.log(data[0])
+      })
     }
 
     return (
@@ -44,9 +61,10 @@ function Navigation(props){
               placeholder="Search"
               className="search_bar form-control"
               aria-label="Search"
+              onChange={e => searchValue = e.target.value}
             />
             </Form>
-            <Button variant="outline-secondary" className="search_button">
+            <Button variant="outline-secondary" className="search_button" onClick={handleSearch}>
                 Search
             </Button>
         </Nav>
