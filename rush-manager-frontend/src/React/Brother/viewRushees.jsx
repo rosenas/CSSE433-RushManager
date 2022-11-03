@@ -1,6 +1,6 @@
 import React from "react";
 import { useState } from 'react';
-import { ToggleButton, ToggleButtonGroup } from "react-bootstrap";
+import { FormCheck, ToggleButton, ToggleButtonGroup } from "react-bootstrap";
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import Modal from 'react-bootstrap/Modal'
@@ -15,6 +15,8 @@ AWS.config.update({
   secretAccessKey: 'Gz9EDFmz5d9FIBdJjLqfQ8yXB3plRePrN3gO+glx'
 })
 
+
+
 const myBucket = new AWS.S3({
   params: { Bucket: S3_BUCKET },
   region: REGION,
@@ -22,7 +24,20 @@ const myBucket = new AWS.S3({
 
 
 function ViewRushees(props) {
+  
+  const [run, setRun] = useState(false)
   const [rushees, setRushees] = useState([])
+  
+  // console.log(props.searchRes)
+
+
+  
+  // if(props.displaySearch && !run) {
+  //   console.log("HERE")
+  //   setRun(true)
+  //   setRushees(props.searchRes)
+  //   console.log(props.searchRes)
+  // }
 
   const [filteredRusheeList, setFilteredRusheeList] = useState([])
 
@@ -44,9 +59,9 @@ function ViewRushees(props) {
         })
         .then(response=> response.json())
         .then(data=>{
-            console.log("test");
+            // console.log("test");
             setEvents(data)
-            console.log(data)
+            // console.log(data)
         })
     }
 
@@ -66,7 +81,24 @@ function ViewRushees(props) {
     'major': "",
     'phone': "",
     'housing': "",
-    'photoURL': ""
+    'photoURL': "",
+    interests: {
+      'football': false,
+      'soccer': false,
+      'baseball': false,
+      'golf': false,
+      'basketball': false,
+      'gpe': false,
+      'gaming': false,
+      'swimming': false,
+      'lifting': false,
+      'running': false,
+      'eating': false,
+      'bickic': false,
+      'clash': false,
+      'basket': false,
+      'ducks': false,
+    }
   };
   const handleFileInput = (e) => {
     setSelectedFile(e.target.files[0]);
@@ -142,6 +174,7 @@ function ViewRushees(props) {
 
   const handleCancel = () => {
     setModal(false);
+    console.log(doc.interests)
   }
 
   const handleAllRushees = () => {
@@ -149,6 +182,7 @@ function ViewRushees(props) {
     setAllRushees(true)
     setOurRushees(false)
     setRusheesWithBids(false)
+    props.setDisplaySearch(false)
   }
 
   const handleOurRushees = () => {
@@ -157,10 +191,12 @@ function ViewRushees(props) {
         return rushee
       }
     });
+    props.setDisplaySearch(false)
     setFilteredRusheeList(filt)
     setAllRushees(false)
     setRusheesWithBids(false)
     setOurRushees(true)
+    
   }
 
   const handleRusheesWithBids = () => {
@@ -173,11 +209,12 @@ function ViewRushees(props) {
     setRusheesWithBids(true)
     setAllRushees(false)
     setOurRushees(false)
+    props.setDisplaySearch(false)
   }
 
 
   const handleSubmit = () => {
-    // uploadFile(photo)
+    uploadFile(photo)
     // console.log(doc)
     fetch("http://localhost:8000/addRushee", {
       method: 'POST',
@@ -192,6 +229,29 @@ function ViewRushees(props) {
       }
       )
   }
+
+  const [football, setFootball] = useState(false)
+
+  const handleFootball = () => {
+    // setFootball(!football)
+    // console.log(doc.interests)
+  }
+
+  const [int, setInt] = useState({
+    'football': false,
+    'soccer': false,
+    'baseball': false,
+    'golf': false,
+    'basketball': false,
+    'gpe': false,
+    'gaming': false,
+    'swimming': false,
+    'lifting': false,
+    'running': false,
+    'eating': false,
+    'bickic': false,
+  })
+
 
   if (rushees.length == 0) {
     getRushees()
@@ -224,22 +284,106 @@ function ViewRushees(props) {
               <input type="text" placeholder="Enter Rushee Name" name="Rushee Name" onChange={e => doc.major = e.target.value} required />
               <label for="Event"><b>ResHall</b></label>
               <input type="text" placeholder="Enter Rushee Name" name="Rushee Name" onChange={e => doc.housing = e.target.value} required />
+              <label for="Date"><b>Photo</b></label>
+              <input type="file" placeholder="Upload Photo" name="photo" onChange={e => handleSetPhoto(e.target.files[0])} required />          
               <div>
-                <h4>Please select your interests:</h4>
-                <div>
-              <Button onClick={handleCancel}>Button</Button>
-              <Button onClick={handleCancel}>Button</Button>
-              <Button onClick={handleCancel}>Button</Button>
+                <h4 style={{marginLeft:20, marginTop: 10}}>Please select your interests:</h4>
+                <div style={{display: "flex"}}>
+                  <div style={{marginLeft:20}}>
+                    <label for="Event"><b>Football</b></label>
+                    <FormCheck placeholder="check me" onChange={e => doc.interests.football = !doc.interests.football}/>
+                  </div>
+                  <div style={{marginLeft:20}}>
+                    <label for="Event"><b>Soccer</b></label>
+                    <FormCheck placeholder="check me" onChange={e => doc.interests.soccer = !doc.interests.soccer}/>
+                  </div>
+                  <div style={{marginLeft:20}}>
+                    <label for="Event"><b>Baseball</b></label>
+                    <FormCheck placeholder="check me" onChange={e => doc.interests.baseball = !doc.interests.baseball}/>
+                  </div>
+                  <div style={{marginLeft:20}}>
+                    <label for="Event"><b>Golf</b></label>
+                    <FormCheck placeholder="check me" onChange={e => doc.interests.golf = !doc.interests.golf}/>
+                  </div>
+                  <div style={{marginLeft:20}}>
+                    <label for="Event"><b>Basketball</b></label>
+                    <FormCheck placeholder="check me" onChange={e => doc.interests.basketball = !doc.interests.basketball}/>
+                  </div>
+                </div>
+
+                <div style={{display: "flex"}}>
+                  <div style={{marginLeft:20}}>
+                    <label for="Event"><b>GPE</b></label>
+                    <FormCheck placeholder="check me" onChange={e => doc.interests.gpe = !doc.interests.gpe}/>
+                  </div>
+                  <div style={{marginLeft:20}}>
+                    <label for="Event"><b>Gaming</b></label>
+                    <FormCheck placeholder="check me" onChange={e => doc.interests.gaming = !doc.interests.gaming}/>
+                  </div>
+                  <div style={{marginLeft:20}}>
+                    <label for="Event"><b>Swimming</b></label>
+                    <FormCheck placeholder="check me" onChange={e => doc.interests.swimming = !doc.interests.swimming}/>
+                  </div>
+                  <div style={{marginLeft:20}}>
+                    <label for="Event"><b>Lifting</b></label>
+                    <FormCheck placeholder="check me" onChange={e => doc.interests.lifting = !doc.interests.lifting}/>
+                  </div>
+                  <div style={{marginLeft:20}}>
+                    <label for="Event"><b>Running</b></label>
+                    <FormCheck placeholder="check me" onChange={e => doc.interests.running = !doc.interests.running}/>
+                  </div>
+                </div>
+
+                <div style={{display: "flex"}}>
+                  <div style={{marginLeft:20}}>
+                    <label for="Event"><b>Eating</b></label>
+                    <FormCheck placeholder="check me" onChange={e => doc.interests.eating = !doc.interests.eating}/>
+                  </div>
+                  <div style={{marginLeft:20}}>
+                    <label for="Event"><b>BIC/KIC</b></label>
+                    <FormCheck placeholder="check me" onChange={e => doc.interests.bickic = !doc.interests.bickic}/>
+                  </div>
+                  <div style={{marginLeft:20}}>
+                    <label for="Event"><b>Clash</b></label>
+                    <FormCheck placeholder="check me" onChange={e => doc.interests.clash = !doc.interests.clash}/>
+                  </div>
+                  <div style={{marginLeft:20}}>
+                    <label for="Event"><b>Basket Weaving</b></label>
+                    <FormCheck placeholder="check me" onChange={e => doc.interests.basket = !doc.interests.basket}/>
+                  </div>
+                  <div style={{marginLeft:20}}>
+                    <label for="Event"><b>Competitive Duck Herding</b></label>
+                    <FormCheck placeholder="check me" onChange={e => doc.interests.ducks = !doc.interests.ducks}/>
+                  </div>
+                </div>
+                </div>
+                </div>
+               
+                {/* <div style={{margin:20}}> */}
+
+              {/* <Button active={football} onClick={e => interests.football = !interests.football}>Football</Button>
+              <Button style={{marginLeft:20}}onClick={e => interests.soccer = !interests.soccer}>Soccer</Button>
+              <Button style={{marginLeft:20}}onClick={e => interests.baseball = !interests.baseball}>Baseball</Button>
+              <Button style={{marginLeft:20}}onClick={e => interests.golf = !interests.golf}>Golf</Button>
               </div>
-              <div>
-              <Button onClick={handleCancel}>Button</Button>
-              <Button onClick={handleCancel}>Button</Button>
-              <Button onClick={handleCancel}>Button</Button>
+              <div style={{margin:20}}>
+              <Button onClick={e => interests.basketball = !interests.basketball}>Basketball</Button>
+              <Button style={{marginLeft:20}}onClick={e => interests.gpe = !interests.gpe}>GPE</Button>
+              <Button style={{marginLeft:20}}onClick={e => interests.gaming = !interests.footgamingball}>Gaming</Button>
+              <Button style={{marginLeft:20}}onClick={e => interests.swimming = !interests.swimming}>Swimming</Button>
               </div>
+              <div style={{margin:20}}>
+              <Button onClick={e => interests.lifting = !interests.lifting}>Lifting</Button>
+              <Button style={{marginLeft:20}} onClick={e => interests.running = !interests.running}>Running</Button>
+              <Button style={{marginLeft:20}}onClick={e => interests.eating = !interests.eating}>Eating</Button>
+              <Button style={{marginLeft:20}}onClick={e => interests.bickic = !interests.bickic}>BIC/KIC</Button>
+              
               </div>
+              <Button style={{marginLeft:20}}onClick={handleFootball}>PRINT</Button>
+              </div> */}
               {/* <label for="Date"><b>Photo</b></label>
               <input type="file" placeholder="Upload Photo" name="photo" onChange={e => handleSetPhoto(e.target.files[0])} required />  */}
-              </div>
+              {/* </div> */}
 
             <div className="Modal-Buttons">
               <Button variant="secondary" onClick={handleCancel}>Cancel</Button>
@@ -267,7 +411,10 @@ function ViewRushees(props) {
         </ToggleButtonGroup>
       </div>
       <div className="container">
-        {rushees && filteredRusheeList.map((rushee) => <RusheeCard events={events} accountInfo={props.accountInfo} rushee={rushee} rusheesWithBids={rusheesWithBids} ourRushees={ourRushees} allRushees={allRushees} getRushees={getRushees} accountType={props.accountType} />)}
+        {console.log(props.displaySearch)}
+        {console.log(rushees)}
+        {props.displaySearch && props.searchRes.map((rushee) => <RusheeCard events={events} accountInfo={props.accountInfo} rushee={rushee} rusheesWithBids={rusheesWithBids} ourRushees={ourRushees} allRushees={allRushees} getRushees={getRushees} accountType={props.accountType} />)}
+        {rushees && !props.displaySearch && filteredRusheeList.map((rushee) => <RusheeCard events={events} accountInfo={props.accountInfo} rushee={rushee} rusheesWithBids={rusheesWithBids} ourRushees={ourRushees} allRushees={allRushees} getRushees={getRushees} accountType={props.accountType} />)}
       </div>
       {
         props.accountType === "admin" &&
@@ -283,7 +430,7 @@ function ViewRushees(props) {
 function RusheeCard(props) {
   let eventsAttended = props.events.map((event) => event.attended.includes(props.rushee.username) && event)
   eventsAttended = eventsAttended.filter((event) => event !== false)
-  console.log(eventsAttended)
+  // console.log(eventsAttended)
   let comment = ""
   const handleAddAComment = () => {
 
@@ -294,9 +441,6 @@ function RusheeCard(props) {
     setCommentModal(false)
   }
 
-  const handleSetComment = (comment) => {
-
-  }
 
   const handleSubmit = () => {
     const loggedInUsername = props.accountInfo.username
@@ -358,6 +502,7 @@ function RusheeCard(props) {
 
   const handleViewComments = () => {
     setViewComments(true)
+    getRecs()
   }
 
   const deleteRushee = () => {
@@ -456,21 +601,54 @@ function RusheeCard(props) {
       )
   }
 
+  const [recs, setRecs] = useState([])
+
+  const getRecs = () => {
+    var info = { 'username': props.rushee.username }
+    fetch("http://127.0.0.1:8000/getRecs", {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(info)
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log(data)
+    setRecs(data)
+  })
+  }
+
   const ViewAComment_Modal = () => {
+    // let recs= [{'name': "grant"}, {'name': "ari"}]
+    
+
+    
+    
+
     return (
+      
       <Modal show={viewComments} onHide={handleCloseComments}>
         <Modal.Header closeButton />
+        
         
         <Modal.Title className="Modal-Title">
           {props.rushee.first + " " + props.rushee.last}
         </Modal.Title>
         <Modal.Body>
           <div>
+          
             {props.rushee.email}
           </div>
           <div>
             {props.rushee.phone}
           </div>
+          <div>
+            <h4>Recommended Brothers:</h4>
+            {recs.map((rec) => {
+              return <div>{rec.first + " " + rec.last}</div>
+            })}
+            </div>
           <div className="rushee_tables">
             <div>
               <h3 className="table-name">Comments</h3>
@@ -526,22 +704,20 @@ function RusheeCard(props) {
   return (
     <div>
       <Card style={{ width: '12rem' }}>
-      <Card.Img class="rusheePhotos" variant="top" src={props.rushee.photoURL} alt="Rushee Picture Here" />
+      <Card.Img style={{ width: '110px' }}class="rusheePhotos" variant="top" src={props.rushee.photoURL} alt="Rushee Picture Here" />
         <Card.Body>
-          <Card.Title>{props.rushee.first + " " + props.rushee.last}</Card.Title>
-          <Card.Text>
-            {props.rushee.major}
-          </Card.Text>
-          <Card.Text>
-            {props.rushee.housing}
-          </Card.Text>
-          <Card.Text>
-            Likes: {props.rushee.fraternityInfo["FIJI"].likes.length}
-          </Card.Text>
+          <div>
+            <div><h5>{props.rushee.first + " " + props.rushee.last}</h5></div>
+            
+            <div>{props.rushee.major}</div>
+            <div>{props.rushee.housing}</div>
+            <div>Likes: {props.rushee.fraternityInfo["FIJI"].likes.length}</div>
+          </div>
           <div className="Rushee-Buttons">
             <Button variant="outline-dark " onClick={handleAddAComment}>Comment</Button>
             <Like_Button />
-            <Bid_Button />
+            {props.accountType === "admin" &&
+            <Bid_Button />}
             <Button variant="outline-dark" onClick={handleViewComments}>More Info</Button>
             {props.accountType === "admin" && props.allRushees &&
               <Button variant="outline-dark" onClick={deleteRushee}>Delete Rushee</Button>}

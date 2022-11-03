@@ -6,12 +6,11 @@ import Form from 'react-bootstrap/Form'
 import { useState } from 'react';
 
 function Navigation(props){
-
+    
     let searchValue = ""
-
-    const [search, setSearch] = useState([])
+    // const [searchRushees, setSearchRushees] = useState(false)
+    // const [search, setSearch] = useState([])
     const handleSearch = () => {
-    console.log(searchValue)
     let data = {'body': searchValue}
     fetch("http://127.0.0.1:8000/searchRushee", {
       method: 'POST',
@@ -22,9 +21,8 @@ function Navigation(props){
     })
       .then(response => response.json())
       .then(data=>{
-          console.log("res");
-          setSearch(data)
-          console.log(data[0])
+          props.setDisplaySearch(true)
+          props.setSearchRes(data)
       })
     }
 
@@ -32,7 +30,7 @@ function Navigation(props){
         <Nav variant="tabs">
              <Nav.Item>
                 <Nav.Link >
-                    <NavLink to="/rushees">Rushees</NavLink>
+                    <NavLink to="/rushees" >Rushees</NavLink>
                 </Nav.Link>
             </Nav.Item>
             <Nav.Item>

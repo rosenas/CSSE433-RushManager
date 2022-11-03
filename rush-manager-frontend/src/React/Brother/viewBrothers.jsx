@@ -1,11 +1,26 @@
 import React from "react";
 import { useState } from 'react';
-import { ToggleButton, ToggleButtonGroup } from "react-bootstrap";
+import { FormCheck, ToggleButton, ToggleButtonGroup } from "react-bootstrap";
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import Modal from 'react-bootstrap/Modal'
 import "../../CSS/index.css"
+import AWS from 'aws-sdk'
 
+const S3_BUCKET = 'rushee-images';
+const REGION = 'us-east-2';
+
+AWS.config.update({
+  accessKeyId: 'AKIA3OZ5F5ALHBCZERER',
+  secretAccessKey: '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'
+})
+
+
+
+const myBucket = new AWS.S3({
+  params: { Bucket: S3_BUCKET },
+  region: REGION,
+})
 
 
 function ViewBrothers(props){
@@ -13,7 +28,8 @@ function ViewBrothers(props){
     const [requestedBrothersList, setRequestedBrothersList] = useState([])
     const [ourBrothers, setOurBrothers] = useState(true)
     const [requestedBrothers, setRequestedBrothers] = useState(false)
-    
+    const [progress, setProgress] = useState(0);
+    const [selectedFile, setSelectedFile] = useState(null);
 
     const [modal, setModal] = useState(false)
 
@@ -26,7 +42,26 @@ function ViewBrothers(props){
           'email': "",
           'major': "",
           'phone': "",
-          'housing': ""};
+          'housing': "",
+          'photoURL': "",
+          interests: {
+            'football': false,
+            'soccer': false,
+            'baseball': false,
+            'golf': false,
+            'basketball': false,
+            'gpe': false,
+            'gaming': false,
+            'swimming': false,
+            'lifting': false,
+            'running': false,
+            'eating': false,
+            'bickic': false,
+            'clash': false,
+            'basket': false,
+            'ducks': false,
+          }
+        };
 
 
     
@@ -58,7 +93,28 @@ function ViewBrothers(props){
               })
     }
 
-
+    const handleFileInput = (e) => {
+      setSelectedFile(e.target.files[0]);
+    }
+  
+  
+    const uploadFile = (file) => {
+      doc.photoURL = "https://rushee-images.s3.us-east-2.amazonaws.com/" + encodeURIComponent(file.name)
+      const params = {
+        ACL: 'public-read',
+        Body: file,
+        Bucket: S3_BUCKET,
+        Key: file.name
+      };
+  
+      myBucket.putObject(params)
+        .on('httpUploadProgress', (evt) => {
+          setProgress(Math.round((evt.loaded / evt.total) * 100))
+        })
+        .send((err) => {
+          if (err) console.log(err)
+        })
+    }
     
 
 
@@ -81,7 +137,8 @@ function ViewBrothers(props){
     }
 
     const handleSubmit = () => {
-      console.log(doc)
+      // console.log(doc)
+      uploadFile(photo)
       fetch("http://localhost:8000/addBrother", {
             method: 'POST',
             headers: {
@@ -139,6 +196,78 @@ function ViewBrothers(props){
                           <input type="text" placeholder="Enter Brother Name" name="Brother Name" onChange={e => doc.housing = e.target.value} required />
                           <label for="Date"><b>Photo</b></label>
                           <input type="file" placeholder="Upload Photo" name="photo" onChange={e => handleSetPhoto(e.target.files[0])} required />
+                          <div>
+                <h4 style={{marginLeft:20, marginTop: 10}}>Please select your interests:</h4>
+                <div style={{display: "flex"}}>
+                  <div style={{marginLeft:20}}>
+                    <label for="Event"><b>Football</b></label>
+                    <FormCheck placeholder="check me" onChange={e => doc.interests.football = !doc.interests.football}/>
+                  </div>
+                  <div style={{marginLeft:20}}>
+                    <label for="Event"><b>Soccer</b></label>
+                    <FormCheck placeholder="check me" onChange={e => doc.interests.soccer = !doc.interests.soccer}/>
+                  </div>
+                  <div style={{marginLeft:20}}>
+                    <label for="Event"><b>Baseball</b></label>
+                    <FormCheck placeholder="check me" onChange={e => doc.interests.baseball = !doc.interests.baseball}/>
+                  </div>
+                  <div style={{marginLeft:20}}>
+                    <label for="Event"><b>Golf</b></label>
+                    <FormCheck placeholder="check me" onChange={e => doc.interests.golf = !doc.interests.golf}/>
+                  </div>
+                  <div style={{marginLeft:20}}>
+                    <label for="Event"><b>Basketball</b></label>
+                    <FormCheck placeholder="check me" onChange={e => doc.interests.basketball = !doc.interests.basketball}/>
+                  </div>
+                </div>
+
+                <div style={{display: "flex"}}>
+                  <div style={{marginLeft:20}}>
+                    <label for="Event"><b>GPE</b></label>
+                    <FormCheck placeholder="check me" onChange={e => doc.interests.gpe = !doc.interests.gpe}/>
+                  </div>
+                  <div style={{marginLeft:20}}>
+                    <label for="Event"><b>Gaming</b></label>
+                    <FormCheck placeholder="check me" onChange={e => doc.interests.gaming = !doc.interests.gaming}/>
+                  </div>
+                  <div style={{marginLeft:20}}>
+                    <label for="Event"><b>Swimming</b></label>
+                    <FormCheck placeholder="check me" onChange={e => doc.interests.swimming = !doc.interests.swimming}/>
+                  </div>
+                  <div style={{marginLeft:20}}>
+                    <label for="Event"><b>Lifting</b></label>
+                    <FormCheck placeholder="check me" onChange={e => doc.interests.lifting = !doc.interests.lifting}/>
+                  </div>
+                  <div style={{marginLeft:20}}>
+                    <label for="Event"><b>Running</b></label>
+                    <FormCheck placeholder="check me" onChange={e => doc.interests.running = !doc.interests.running}/>
+                  </div>
+                </div>
+
+                <div style={{display: "flex"}}>
+                  <div style={{marginLeft:20}}>
+                    <label for="Event"><b>Eating</b></label>
+                    <FormCheck placeholder="check me" onChange={e => doc.interests.eating = !doc.interests.eating}/>
+                  </div>
+                  <div style={{marginLeft:20}}>
+                    <label for="Event"><b>BIC/KIC</b></label>
+                    <FormCheck placeholder="check me" onChange={e => doc.interests.bickic = !doc.interests.bickic}/>
+                  </div>
+                  <div style={{marginLeft:20}}>
+                    <label for="Event"><b>Clash</b></label>
+                    <FormCheck placeholder="check me" onChange={e => doc.interests.clash = !doc.interests.clash}/>
+                  </div>
+                  <div style={{marginLeft:20}}>
+                    <label for="Event"><b>Basket Weaving</b></label>
+                    <FormCheck placeholder="check me" onChange={e => doc.interests.basket = !doc.interests.basket}/>
+                  </div>
+                  <div style={{marginLeft:20}}>
+                    <label for="Event"><b>Competitive Duck Herding</b></label>
+                    <FormCheck placeholder="check me" onChange={e => doc.interests.ducks = !doc.interests.ducks}/>
+                  </div>
+                </div>
+                </div>
+                      
                       </div>
                       
                       <div className="Modal-Buttons">
@@ -257,7 +386,7 @@ function BrotherCard(props){
   return (
     <div>
     <Card style={{ width: '12rem' }}>
-      <Card.Img variant="top" src="holder.js/100px180" alt="Brother Picture Here"/>
+    <Card.Img style={{ width: '110px' }}class="rusheePhotos" variant="top" src={props.brother.photoURL} alt="Brother Picture Here" />
       {console.log(props.brother)}
       <Card.Body>
         <Card.Title>{props.brother.first + " " + props.brother.last}</Card.Title>
