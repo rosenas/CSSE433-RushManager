@@ -17,7 +17,7 @@ app = Flask(__name__)
 uri = "neo4j://localhost:7687"
 # uri= "neo4j://433-09.csse.rose-hulman.edu:7687"
 driver = GraphDatabase.driver(uri, auth=("neo4j", "password"))
-
+# driver = None
 
 
 def neoInit(tx):
@@ -47,6 +47,7 @@ def neoInit(tx):
 
 import couchdb
 couch = couchdb.Server('http://admin:couch@137.112.104.178:5984/')
+# couch = None
 try:
   db = couch['testdb']
 except:
@@ -56,6 +57,7 @@ except:
 #137.112.104.255:7474
 
 redis = redis.Redis()
+# redis = None
 redisRusheeHash = "rusheeHash"
 redisBrotherHash = "brotherHash"
 
@@ -182,8 +184,10 @@ def readQueue():
       elif(split[0] == "NEO4J"):
         if(split[1] == "addInterests"):
           res = False
-          with driver.session(database="neo4j") as session:
-            res = session.execute_write(neo4jAddUserAndInterests, split[2], split[3], split[4], split[5], split[6])
+          try:
+            with driver.session(database="neo4j") as session:
+              res = session.execute_write(neo4jAddUserAndInterests, split[2], split[3], split[4], split[5], split[6])
+          except: res = False
           #res = neo4jAddInterests(split[2], split[3], split[4], split[5])
           if res:
             line = "DONE%&%" + split[1] + "%&%" + split[2] + "%&%" + split[3] + "%&%" + split[4] + "%&%" + split[5] + "%&%" + split[6]
@@ -193,8 +197,10 @@ def readQueue():
           None
         elif(split[1] == "deleteUser"):
           res = False
-          with driver.session(database="neo4j") as session:
-            res = session.execute_write(neo4jDeleteUser, split[2], split[3])
+          try:
+            with driver.session(database="neo4j") as session:
+              res = session.execute_write(neo4jDeleteUser, split[2], split[3])
+          except: res = False
           #res = neo4jAddInterests(split[2], split[3], split[4], split[5])
           if res:
             line = "DONE%&%" + split[1] + "%&%" + split[2] + "%&%" + split[3]
@@ -214,6 +220,8 @@ def readQueue():
 
 
 def neo4jAddUserAndInterests(tx, type, username, first, last, interests):
+  if not driver:
+    return False
   interests = json.loads(interests)
   if(type == "rushee"):
     tx.run("CREATE (a:Rushee {username: $username, first: $first, last: $last})", 
@@ -234,6 +242,8 @@ def neo4jAddUserAndInterests(tx, type, username, first, last, interests):
   return True
 
 def neo4jDeleteUser(tx, type, username):
+  if not driver:
+    return False
   # print(type + " " + username)
   username = username.replace("\n", "")
   if(type == "rushee"):
@@ -255,6 +265,8 @@ def neo4jDeleteUser(tx, type, username):
 @app.route("/getRecs", methods = ['POST'])
 def getRecs():
   # print("Get recs")
+  if not driver:
+    return ["NEO4J is down: recommendation feature not available"]
   if request.method == 'POST':
     data = request.get_json().get('body')
     
@@ -291,49 +303,39 @@ def hello():
 
   return "Connected to python!"
 
-# def redisAddBrother(name, username):
-#   # redis.hset(redisBrotherHash, name, username)
-#   # redisGetBrothers()
-#   redis.sadd(name, username)
-#   return True
-
-# def redisDeleteBrother(name, username):
-#   # redis.hdel(redisBrotherHash, name)
-#   # redisGetBrothers()
-#   redis.srem(name, username)
-#   return True
-
-# def redisGetBrothers():
-#   # print("getting redis brothers")
-#   None
-#   # brothers = redis.hgetall(redisBrotherHash)
-#   # print(brothers)
-
 def redisAddRushee(name, username):
-  # print(name, username)
-  #queue("REDIS%&%addAsUser%&%rushee%&%" + name + "%&%" + username)
-  # redis.hset(redisRusheeHash, name, username)
-  # redisGetRushees()
+  if not redis:
+    return False
   redis.sadd(name, username)
+  split = name.split(" ")
+  try:
+    redis.sadd(split[0], username)
+  except: None
+  try:
+    redis.sadd(split[1], username)
+  except: None
   return True
 
 def redisDeleteRushee(name, username):
-  # print(name)
-  # redis.hdel(redisRusheeHash, name)
-  # redisGetRushees()
+  if not redis:
+    return False
   redis.srem(name, username)
+  split = name.split(" ")
+  try:
+    redis.srem(split[0], username)
+  except: None
+  try:
+    redis.srem(split[1], username)
+  except: None
   return True
 
-def redisGetRushees():
-  # print("getting redis rushees")
-  None
-  # rushees = redis.hgetall(redisRusheeHash)
-  # print(rushees)
 
 @app.route("/searchRushee", methods = ['POST'])
 def redisSearch():
   # redis.sadd("j", "j")
   # redis.sadd("j", "jj")
+  if not redis:
+    return ["REDIS is currently down: search feature disabled"]
   if request.method == 'POST':
     data = request.get_json().get('body')
     
@@ -511,6 +513,18 @@ def addRushee():
   addUser(data, "rushee")
   return "Rushee added"
 
+@app.route("/isUniqueUserName", methods = ['POST'])
+def uniqueUsername():
+  data = ""
+  if request.method == 'POST':
+    data = request.get_json().get('body').get('username')
+  username = data
+  res = db.find({'selector': {'username': username}})
+  for item in res:
+    if(item['username'] == username):
+      return {'isUnique': False}
+    
+  return {'isUnique': True}
 
 @app.route("/addAsBrother", methods = ['POST'])
 def addAsBrother():
@@ -521,6 +535,20 @@ def addAsBrother():
     data = request.get_json().get('body')
   # print(data)
   queue("TODO%&%changeUserType%&%brother%&%" + data.get('username'))
+  return "Rushee added"
+
+
+@app.route("/makeBrotherAdmin", methods = ['POST'])
+def makeBrotherAdmin():
+  #from a rush chairs "add rushee button"
+  data = ""
+  # print("ADDING AS BROTHER")
+  if request.method == 'POST':
+    data = request.get_json().get('body')
+  data = data.get('query')
+  print(data)
+  # print(data)
+  queue("TODO%&%changeUserType%&%admin%&%" + data)
   return "Rushee added"
 
 
@@ -576,7 +604,7 @@ def getBrothers():
   readQueue()
   type = "brother"
   frat = "FIJI"
-  getQuery = {'selector': {'$or': [{'type': "brother"}, {'type': "requestedBrother"}]}}   
+  getQuery = {'selector': {'$or': [{'type': "brother"}, {'type': "admin"}, {'type': "requestedBrother"}]}}   
   res = db.find(getQuery)
   data = []
   for doc in res:
@@ -884,6 +912,10 @@ def couchDeleteEvent(name):
     ret = db.delete(doc)
   #TODO : Check ret
   return True
+
+#auto check queue anytime server is started
+readQueue()
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0',port=5000)

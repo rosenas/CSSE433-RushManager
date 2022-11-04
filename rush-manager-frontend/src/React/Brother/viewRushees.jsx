@@ -6,6 +6,7 @@ import Card from 'react-bootstrap/Card';
 import Modal from 'react-bootstrap/Modal'
 import "../../CSS/index.css"
 import AWS from 'aws-sdk'
+import Popup from "reactjs-popup";
 
 const S3_BUCKET = 'rushee-images';
 const REGION = 'us-east-2';
@@ -29,7 +30,7 @@ function ViewRushees(props) {
   const [rushees, setRushees] = useState([])
   
   // console.log(props.searchRes)
-
+  
 
   
   // if(props.displaySearch && !run) {
@@ -257,6 +258,15 @@ function ViewRushees(props) {
     getRushees()
   }
 
+  const redisDownPopup = () => {
+    return (
+      
+      <Popup>
+        <div>POPUP</div>
+      </Popup>
+    )
+  }
+
   const AddRushEvent_Rushee = () => {
     return (
       <Modal show={modal} onHide={handleClose}>
@@ -275,7 +285,7 @@ function ViewRushees(props) {
               <label for="Event"><b>Username</b></label>
               <input type="text" placeholder="Enter Rushee Name" name="Rushee Name" onChange={e => doc.username = e.target.value} required />
               <label for="Event"><b>Password</b></label>
-              <input type="text" placeholder="Enter Password" name="Rushee Name" onChange={e => doc.password = e.target.value} required />
+              <input type="password" placeholder="Enter Password" name="Rushee Name" onChange={e => doc.password = e.target.value} required />
               <label for="Event"><b>Email</b></label>
               <input type="text" placeholder="Enter Rushee Name" name="Rushee Name" onChange={e => doc.email = e.target.value} required />
               <label for="Event"><b>Phone Number</b></label>
@@ -411,6 +421,7 @@ function ViewRushees(props) {
         </ToggleButtonGroup>
       </div>
       <div className="container">
+      {props.redisDown && <redisDownPopup></redisDownPopup>}
         {console.log(props.displaySearch)}
         {console.log(rushees)}
         {props.displaySearch && props.searchRes.map((rushee) => <RusheeCard events={events} accountInfo={props.accountInfo} rushee={rushee} rusheesWithBids={rusheesWithBids} ourRushees={ourRushees} allRushees={allRushees} getRushees={getRushees} accountType={props.accountType} />)}
@@ -645,7 +656,8 @@ function RusheeCard(props) {
           </div>
           <div>
             <h4>Recommended Brothers:</h4>
-            {recs.map((rec) => {
+            {recs[0] === "NEO4J is down: recommendation feature not available" ? <div>NEO4J is down: recommendation feature not available</div> :
+            recs.map((rec) => {
               return <div>{rec.first + " " + rec.last}</div>
             })}
             </div>
@@ -704,10 +716,10 @@ function RusheeCard(props) {
   return (
     <div>
       <Card style={{ width: '12rem' }}>
-      <Card.Img style={{ width: '110px' }}class="rusheePhotos" variant="top" src={props.rushee.photoURL} alt="Rushee Picture Here" />
+      <Card.Img style={{ maxHeight:"100px", display: "block", marginLeft: "auto", marginRight: "auto" }} class="rusheePhotos" variant="top" src={props.rushee.photoURL} alt="Rushee Picture Here" />
         <Card.Body>
           <div>
-            <div><h5>{props.rushee.first + " " + props.rushee.last}</h5></div>
+            <h5 style={{ justifyContent: "center", display: "flex", whiteSpace: "nowrap"}}>{props.rushee.first + " " + props.rushee.last}</h5>
             
             <div>{props.rushee.major}</div>
             <div>{props.rushee.housing}</div>

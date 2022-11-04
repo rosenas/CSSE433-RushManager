@@ -9,7 +9,10 @@ import { useState } from "react";
 
 
 
-function Contact(){
+function Contact(props){
+    // if(props.accountType === 'admin') {
+    //     console.log("ADMIN")
+    // }
 
     const _rushChairs = [
         {
@@ -29,11 +32,13 @@ function Contact(){
     }
 
     
-
     return(
         <>
             <h1 className="title">Contact us</h1>
-            <div>
+            <div style={{justifyContent: "center"}}>
+            <img style={{ display: "block", marginLeft: "auto", marginRight: "auto" }} class="rusheePhotos" variant="top" src={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTgQ_hEpiFXEdZ6zg8Yn1mKSRir3F8sXw6lYg&usqp=CAU"} alt="Rushee Picture Here" />
+            </div>
+            <div >
             {rushChairs && rushChairs.map((rushChair) => <RushChair rushChair={rushChair}/>)}
             
             </div>
@@ -45,7 +50,8 @@ function Contact(){
 
 function RushChair(props){
     return (
-        <Card style={{ width: '30rem' }}>
+        <>
+        <Card style={{ width: '30rem', display: "block", marginLeft: "auto", marginRight: "auto" }}>
             <Card.Body>
                 <Card.Title>{props.rushChair.name}</Card.Title>
                 <Card.Text>
@@ -53,6 +59,8 @@ function RushChair(props){
                 </Card.Text>
             </Card.Body>
         </Card>
+        <br></br>
+        </>
     )
 }
 

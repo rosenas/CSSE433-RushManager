@@ -234,6 +234,19 @@ app.post("/deleteBrother", (req, res1) => {
 
 })
 
+app.post("/makeBrotherAdmin", (req, res1) => {
+  request.post('http://127.0.0.1:5000/makeBrotherAdmin', {
+    json: true,
+    body: req
+  }, (err, res, body) => {
+    if (err) {
+      return console.log(err);
+    }
+    res1.send("Brother is admin")
+  });
+
+})
+
 app.post("/addAsBrother", (req, res1) => {
   request.post('http://127.0.0.1:5000/addAsBrother', {
     json: true,
@@ -247,6 +260,18 @@ app.post("/addAsBrother", (req, res1) => {
 
 })
 
+app.post("/isUniqueUserName", (req, res1) => {
+  request.post('http://127.0.0.1:5000/isUniqueUserName', {
+    json: true,
+    body: req
+  }, (err, res, body) => {
+    if (err) {
+      return console.log(err);
+    }
+    res1.send(body)
+  });
+
+})
 
 app.post("/changeBid", (req, res1) => {
   request.post('http://127.0.0.1:5000/changeBid', {

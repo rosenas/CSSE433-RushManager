@@ -76,7 +76,7 @@ function ViewBrothers(props){
               .then(data=>{
                 setBrothers(data)
                 var filteredBrother = data.filter(rushee => {
-                    if(rushee.type === "brother") {
+                    if(rushee.type === "brother" || rushee.type === "admin") {
                       return rushee
                     }
                   }
@@ -313,19 +313,20 @@ function ViewBrothers(props){
         <ToggleButton active={ourBrothers} onClick={handleOurBrothers} value="all">Our Brothers</ToggleButton>
         <ToggleButton active={requestedBrothers} value="ourList" onClick={handleRequestedBrothers} >Requested Brothers</ToggleButton>
       </ToggleButtonGroup>
+      
         </div>
+        {props.accountType === "admin" &&
+        <div className= "add">
+            <Button variant="light" className="add_button"onClick={handleAddBrother}>Add Brother</Button>
+        </div>}
         <div className="container">
+        
          {brothers && ourBrothers && brothers.map((brother) => <BrotherCard brother={brother} getBrothers = {getBrothers} accountType = {props.accountType}/>)}
          {requestedBrothersList && requestedBrothers && requestedBrothersList.map((brother) => <BrotherCard getBrothers = {getBrothers} brother={brother} accountType = {props.accountType}/>)}
         
         </div>
         
-        {
-          props.accountType === "admin" &&
-        <div className= "add">
-            <Button variant="light" className="add_button"onClick={handleAddBrother}>Add Brother</Button>
-        </div>
-        }
+        
 
         <AddBrotherModal/>
         </>
@@ -357,8 +358,25 @@ function BrotherCard(props){
         )
   }
 
+  const makeAdmin = () => {
+    var info = {'query': props.brother.username}
+    fetch("http://localhost:8000/makeBrotherAdmin", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+
+            body: JSON.stringify(info)
+
+
+        })
+        .then(respnse =>{
+                props.getBrothers()
+            }
+        )
+  }
+
   const addAsBrother = () => {
-    console.log("deleting " + props.brother.username)
     var info = {'username': props.brother.username}
     fetch("http://localhost:8000/addAsBrother", {
             method: 'POST',
@@ -386,25 +404,33 @@ function BrotherCard(props){
   return (
     <div>
     <Card style={{ width: '12rem' }}>
-    <Card.Img style={{ width: '110px' }}class="rusheePhotos" variant="top" src={props.brother.photoURL} alt="Brother Picture Here" />
-      {console.log(props.brother)}
-      <Card.Body>
-        <Card.Title>{props.brother.first + " " + props.brother.last}</Card.Title>
-        <Card.Text>
+      
+    <img style={{  maxHeight:"100px", display: "block", marginLeft: "auto", marginRight: "auto" }} class="rusheePhotos" variant="top" src={props.brother.photoURL} alt="Brother Picture Here" />
+   
+      {/* {console.log(props.brother)} */}
+      <div>
+        <div style={{overflow: 'hidden', whiteSpace: 'nowrap'}}>{props.brother.first + " " + props.brother.last}</div>
+        <div>
             {props.brother.major}
-        </Card.Text>
-        <Card.Text>
+        </div>
+        <div>
           {props.brother.housing}
-        </Card.Text>
+        </div>
+        {props.accountType === "admin" &&
         <div className="Brother-Buttons">
           
           {props.accountType === "admin" &&
           <Button variant="outline-dark" onClick={deleteBrother}>Delete Brother</Button>}
-            
+          <br></br>
+          {props.accountType === "admin" && props.brother.type !== "admin" &&
+          <Button variant="outline-dark" onClick={makeAdmin}>Make Admin</Button>}
+          {props.accountType === "admin" && props.brother.type === "admin" &&
+          <Button variant="outline-dark" onClick={addAsBrother}>Remove Admin</Button>}
+            <br></br>
             {props.accountType === "admin" && props.brother.type === "requestedBrother" &&
           <Button variant="outline-dark" onClick={addAsBrother}>Add as Brother</Button>}
-          </div>
-      </Card.Body>
+          </div> }
+      </div>
     
     </Card>
 

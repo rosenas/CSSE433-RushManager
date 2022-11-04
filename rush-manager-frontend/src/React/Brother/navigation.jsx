@@ -3,15 +3,16 @@ import Nav from "react-bootstrap/Nav"
 import { NavLink } from "react-router-dom";
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
+import Popup from 'reactjs-popup';
 import { useState } from 'react';
 
 function Navigation(props){
     
     let searchValue = ""
     // const [searchRushees, setSearchRushees] = useState(false)
-    // const [search, setSearch] = useState([])
+    const [search, setSearch] = useState("")
     const handleSearch = () => {
-    let data = {'body': searchValue}
+    let data = {'body': search}
     fetch("http://127.0.0.1:8000/searchRushee", {
       method: 'POST',
       headers: {
@@ -21,8 +22,15 @@ function Navigation(props){
     })
       .then(response => response.json())
       .then(data=>{
-          props.setDisplaySearch(true)
-          props.setSearchRes(data)
+        console.log(props)
+        if(data[0] === "REDIS is currently down: search feature disabled"){
+            console.log(data[0])
+            props.setRedisDown(true)
+        } else{
+            props.setDisplaySearch(true)
+            props.setSearchRes(data)
+        }
+          
       })
     }
 
@@ -38,18 +46,19 @@ function Navigation(props){
                     <NavLink to="/rushEvents">Rush Events</NavLink> 
                 </Nav.Link>
             </Nav.Item>
-            {/* {console.log("ACC TYPE:" + props.accountType)} */}
+            
            
             <Nav.Item>
             <Nav.Link>
                 <NavLink to="/viewBrothers">Brothers</NavLink> 
             </Nav.Link>
+
         </Nav.Item>
             
             {props.accountType === "admin" &&
             <Nav.Item>
             <Nav.Link>
-                <NavLink to="/rushEvents">Administration</NavLink> 
+                <NavLink accountType={props.accountType} to="/contact">Administration</NavLink> 
             </Nav.Link>
         </Nav.Item>
             }
@@ -59,7 +68,8 @@ function Navigation(props){
               placeholder="Search"
               className="search_bar form-control"
               aria-label="Search"
-              onChange={e => searchValue = e.target.value}
+              onChange={e => setSearch(e.target.value)}
+            //   onChange={e => searchValue = e.target.value}
             />
             </Form>
             <Button variant="outline-secondary" className="search_button" onClick={handleSearch}>

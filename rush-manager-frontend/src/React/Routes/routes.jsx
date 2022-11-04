@@ -36,13 +36,16 @@ function MyRouter(){
 function LoggedInRouter({accountType, setToken, accountInfo }){
     const [displaySearch, setDisplaySearch] = useState(false)
     const [searchRes, setSearchRes] = useState([])
+    const [redisDown, setRedisDown] = useState(false)
 
 
     const handleLogOut = () => {
         setToken("invalid")
     }
 
-    if (accountType == "Admin"){
+
+
+    if (accountType == "Admin" || accountType == "admin" ){
 
         
         
@@ -55,11 +58,13 @@ function LoggedInRouter({accountType, setToken, accountInfo }){
                  <Routes>
                     <Route path="/rushEvents" element={<RushEvents_Brother accountInfo= {accountInfo} accountType = {"admin"}/>}/>
 
-                    <Route path="/viewRushees" element={<ViewRushees accountInfo= {accountInfo} searchRes={searchRes} displaySearch={displaySearch} setDisplaySearch={setDisplaySearch} setSearchRes={setSearchRes} accountType = {"admin"}/>}/>
+                    <Route path="/viewRushees" element={<ViewRushees redisDown={redisDown} accountInfo= {accountInfo} setRedisDown={setRedisDown} searchRes={searchRes} displaySearch={displaySearch} setDisplaySearch={setDisplaySearch} setSearchRes={setSearchRes} accountType = {"admin"}/>}/>
 
                     <Route path="/viewBrothers" element={<ViewBrothers accountInfo= {accountInfo} accountType = {"admin"}/>}/>
 
-                    <Route path= "*" element={<ViewRushees searchRes={searchRes} displaySearch={displaySearch} setDisplaySearch={setDisplaySearch} setSearchRes={setSearchRes} accountInfo= {accountInfo} accountType = {"admin"}/>}/>
+                    <Route path="/contact" element={<Contact accountInfo= {accountInfo} accountType = {"admin"}/>}/>
+
+                    <Route path= "*" element={<ViewRushees setRedisDown={setRedisDown} redisDown={redisDown} searchRes={searchRes} displaySearch={displaySearch} setDisplaySearch={setDisplaySearch} setSearchRes={setSearchRes} accountInfo= {accountInfo} accountType = {"admin"}/>}/>
                 </Routes>
             </Router>
            

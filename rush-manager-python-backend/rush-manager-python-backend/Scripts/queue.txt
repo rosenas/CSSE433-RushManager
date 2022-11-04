@@ -1,3 +1,8 @@
-DONE%&%addInterests%&%rushee%&%dylan%&%Dylan%&%Settles%&%{"football": true, "soccer": false, "baseball": false, "golf": true, "basketball": false, "gpe": false, "gaming": true, "swimming": false, "lifting": true, "running": true, "eating": false, "bickic": false, "clash": false, "basket": true, "ducks": true}
-DONE%&%addAsUser%&%rushee%&%Dylan Settles%&%dylan
-DONE%&%addUser%&%{"type": "rushee", "first": "Dylan", "last": "Settles", "email": "dylan@gmail.com", "major": "ENGD", "password": "$2b$12$vhZ4qn6wBuhCX7YEFhpw1OSgMJ7xsNkVC.zdNf1Hes96zlc3gi7Ae", "housing": "Harbor", "interests": [], "interestedInFIJI": false, "username": "dylan", "phone": "627-009-2726", "photoURL": "https://rushee-images.s3.us-east-2.amazonaws.com/settles.jpeg", "fraternityInfo": {"FIJI": {"frat": "FIJI", "bidStatus": false, "rating": "none", "comments": [], "likes": [], "interested": true, "needsDiscussion": false}}}
+DONE%&%addInterests%&%rushee%&%harry%&%Harrison%&%Wight%&%{"football": true, "soccer": false, "baseball": false, "golf": false, "basketball": false, "gpe": false, "gaming": true, "swimming": false, "lifting": true, "running": true, "eating": true, "bickic": false, "clash": true, "basket": true, "ducks": false}
+DONE%&%addAsUser%&%rushee%&%Harrison Wight%&%harry
+DONE%&%addUser%&%{"type": "rushee", "first": "Harrison", "last": "Wight", "email": "harry@gmail.com", "major": "CS", "password": "$2b$12$5T2WOwJK2Bkevy5GQwdbgup0yvJexXhbowMg.iEOQKwzzESrczDcm", "housing": "Campus", "interests": [], "interestedInFIJI": false, "username": "harry", "phone": "273-383-9372", "photoURL": "https://rushee-images.s3.us-east-2.amazonaws.com/harry.jpeg", "fraternityInfo": {"FIJI": {"frat": "FIJI", "bidStatus": false, "rating": "none", "comments": [], "likes": [], "interested": true, "needsDiscussion": false}}}
+DONE%&%changeUserType%&%brother%&%miggy
+DONE%&%changeUserType%&%admin%&%miggy
+DONE%&%changeFratInterest%&%dylan
+DONE%&%changeFratInterest%&%cam
+DONE%&%changeFratInterest%&%kyle

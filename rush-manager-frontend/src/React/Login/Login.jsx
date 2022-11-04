@@ -58,30 +58,6 @@ function Login({ setToken, setAccountType, setAccountInfo }, {}) {
         }
 
 
-    
-
-        // if (username == "b") {
-        //     setToken("valid")
-        //     setAccountType("Brother")
-        // }
-        // else if (username == "r") {
-        //     setToken("valid")
-        //     setAccountType("Rushee")
-        // }
-        // else if (username == "a") {
-        //     setToken("valid")
-        //     setAccountType("Admin")
-        // }
-        // else if (username == "reqB") {
-        //     setToken("valid")
-        //     setAccountType("ReqB")
-        // }
-        // else if (username == "ReqR") {
-        //     setToken("valid")
-        //     setAccountType("ReqR")
-        // }
-
-
 
     }
     let photo;
