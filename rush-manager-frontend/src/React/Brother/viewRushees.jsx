@@ -1,5 +1,5 @@
 import React from "react";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FormCheck, ToggleButton, ToggleButtonGroup } from "react-bootstrap";
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
@@ -16,7 +16,7 @@ AWS.config.update({
   secretAccessKey: 'Gz9EDFmz5d9FIBdJjLqfQ8yXB3plRePrN3gO+glx'
 })
 
-
+let loaded = false
 
 const myBucket = new AWS.S3({
   params: { Bucket: S3_BUCKET },
@@ -25,7 +25,7 @@ const myBucket = new AWS.S3({
 
 
 function ViewRushees(props) {
-  
+  console.log(props)
   const [run, setRun] = useState(false)
   const [rushees, setRushees] = useState([])
   
@@ -69,11 +69,12 @@ function ViewRushees(props) {
     const [progress, setProgress] = useState(0);
     const [selectedFile, setSelectedFile] = useState(null);
 
-    if(events.length == 0){
-        getEvents()
-    }
+    
+
+   
 
   var doc = {
+    'type':"rushee",
     'first': "",
     'last': "",
     'username': "",
@@ -83,6 +84,18 @@ function ViewRushees(props) {
     'phone': "",
     'housing': "",
     'photoURL': "",
+    "fraternityInfo": {
+      "FIJI":
+      {
+        "frat": "FIJI", 
+        "bidStatus": false,
+        "rating": 'none',
+        "comments": [],
+        "likes": [],
+        "interested": true,
+        "needsDiscussion": false
+      }
+    },
     interests: {
       'football': false,
       'soccer': false,
@@ -125,6 +138,7 @@ function ViewRushees(props) {
   }
 
   const getRushees = () => {
+    console.log("GET RUSHEES")
     fetch('http://localhost:8000/getRushees', {
       headers: {
         'Content-Type': 'application/json',
@@ -133,9 +147,16 @@ function ViewRushees(props) {
     })
       .then(response => response.json())
       .then(data => {
+        console.log("DATA")
+        console.log(data)
         setRushees(data)
         filterRushees(data)
       })
+      // .catch(error => {
+      //   console.log("ERROR IN COUCH")
+
+      // })
+
   }
 
   async function filterRushees(data) {
@@ -162,6 +183,20 @@ function ViewRushees(props) {
   const handleAddRushee = () => {
     setModal(true)
   }
+
+  // if (rushees.length === 0 ) {
+  //   getRushees()
+  //   // getEvents()
+  //   // loaded = true
+  // } 
+
+
+  useEffect(() => {
+    getRushees()
+    getEvents()
+  }, [])
+
+  
 
   let photo;
   const handleSetPhoto = (_photo) => {
@@ -215,6 +250,9 @@ function ViewRushees(props) {
 
 
   const handleSubmit = () => {
+    let tempRushees = rushees
+    tempRushees.push(doc)
+    setRushees(tempRushees)
     uploadFile(photo)
     // console.log(doc)
     fetch("http://localhost:8000/addRushee", {
@@ -231,12 +269,16 @@ function ViewRushees(props) {
       )
   }
 
-  const [football, setFootball] = useState(false)
-
-  const handleFootball = () => {
-    // setFootball(!football)
-    // console.log(doc.interests)
+  const removeRusheeLocally = (rushee) => {
+    console.log("DELETE " + rushee)
+    let temp = rushees
+    temp.filter((rush) => (rush !== rushee))
+    // temp.remove(rushee)
+    setRushees(temp)
+   
   }
+
+
 
   const [int, setInt] = useState({
     'football': false,
@@ -254,9 +296,7 @@ function ViewRushees(props) {
   })
 
 
-  if (rushees.length == 0) {
-    getRushees()
-  }
+  
 
   const redisDownPopup = () => {
     return (
@@ -424,8 +464,8 @@ function ViewRushees(props) {
       {props.redisDown && <redisDownPopup></redisDownPopup>}
         {console.log(props.displaySearch)}
         {console.log(rushees)}
-        {props.displaySearch && props.searchRes.map((rushee) => <RusheeCard events={events} accountInfo={props.accountInfo} rushee={rushee} rusheesWithBids={rusheesWithBids} ourRushees={ourRushees} allRushees={allRushees} getRushees={getRushees} accountType={props.accountType} />)}
-        {rushees && !props.displaySearch && filteredRusheeList.map((rushee) => <RusheeCard events={events} accountInfo={props.accountInfo} rushee={rushee} rusheesWithBids={rusheesWithBids} ourRushees={ourRushees} allRushees={allRushees} getRushees={getRushees} accountType={props.accountType} />)}
+        {props.displaySearch && props.searchRes.map((rushee) => <RusheeCard rushees={rushees} setRushees={setRushees} removeLocally={removeRusheeLocally} events={events} accountInfo={props.accountInfo} rushee={rushee} rusheesWithBids={rusheesWithBids} ourRushees={ourRushees} allRushees={allRushees} getRushees={getRushees} accountType={props.accountType} />)}
+        {rushees && !props.displaySearch && filteredRusheeList.map((rushee) => <RusheeCard  rushees={rushees} setRushees={setRushees} removeLocally={removeRusheeLocally} events={events} accountInfo={props.accountInfo} rushee={rushee} rusheesWithBids={rusheesWithBids} ourRushees={ourRushees} allRushees={allRushees} getRushees={getRushees} accountType={props.accountType} />)}
       </div>
       {
         props.accountType === "admin" &&
@@ -455,6 +495,7 @@ function RusheeCard(props) {
 
   const handleSubmit = () => {
     const loggedInUsername = props.accountInfo.username
+    props.rushee.fraternityInfo["FIJI"].comments.push({'comment': comment, 'user': loggedInUsername})
     var info = { 'user': loggedInUsername, 'rushee': props.rushee.username, 'comment': comment}
     fetch("http://127.0.0.1:8000/addComment", {
       method: 'POST',
@@ -480,6 +521,7 @@ function RusheeCard(props) {
 
   const handleLike = () => {
     const loggedInUsername = props.accountInfo.username
+    props.rushee.fraternityInfo["FIJI"].likes.push(loggedInUsername)
     // console.log(loggedInUsername)
     var info = { 'user': loggedInUsername, 'rushee': props.rushee.username }
     fetch("http://127.0.0.1:8000/likeRushee", {
@@ -496,7 +538,12 @@ function RusheeCard(props) {
   }
 
   const handleDislike = () => {
+    console.log("DISLIKE")
     const loggedInUsername = props.accountInfo.username
+    // let likes = props.rushee.fraternityInfo["FIJI"].likes
+    // console.log(likes)
+    props.rushee.fraternityInfo["FIJI"].likes.filter((user)=>user!==loggedInUsername)
+    // console.log(likes)
     var info = { 'user': loggedInUsername, 'rushee': props.rushee.username }
     fetch("http://127.0.0.1:8000/dislikeRushee", {
       method: 'POST',
@@ -517,6 +564,8 @@ function RusheeCard(props) {
   }
 
   const deleteRushee = () => {
+    ///// delete rushee from rushee list locally
+    
     var info = { 'query': props.rushee.username, 'first':props.rushee.first, 'last': props.rushee.last }
     fetch("http://localhost:8000/deleteRushee", {
       method: 'POST',
@@ -527,18 +576,25 @@ function RusheeCard(props) {
     })
       .then(respnse => {
         props.getRushees()
+        console.log("DELETING")
       }
       )
+      // let temp = props.rushees
+      // temp = temp.filter((rush) => rush !== props.rushee)
+      // props.setRushees(temp)
+
   }
+  
 
   const handleCloseComments = () => {
     setViewComments(false)
   }
 
   const Like_Button = () => {
-    const likes = props.rushee.fraternityInfo["FIJI"].likes
+    let likes = props.rushee.fraternityInfo["FIJI"].likes
     const username = props.accountInfo.username
     if (likes.includes(username)) {
+      
       return (
         <Button onClick={handleDislike} variant="outline-danger" >Dislike</Button>
       )
@@ -550,6 +606,7 @@ function RusheeCard(props) {
   }
 
   const toggleBidStatus = () => {
+    props.rushee.fraternityInfo["FIJI"].bidStatus = !props.rushee.fraternityInfo["FIJI"].bidStatus 
     var info = { 'query': props.rushee.username }
     fetch("http://localhost:8000/changeBid", {
       method: 'POST',

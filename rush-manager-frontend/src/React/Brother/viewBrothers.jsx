@@ -1,5 +1,5 @@
 import React from "react";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FormCheck, ToggleButton, ToggleButtonGroup } from "react-bootstrap";
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
@@ -160,11 +160,15 @@ function ViewBrothers(props){
 
     }
 
-    if(brothers.length == 0){
-        getBrothers()
-        console.log()
+  //   if(brothers.length == 0){
+  //       getBrothers()
+  //       console.log()
       
-  }
+  // }
+
+  useEffect(() => {
+    getBrothers()
+  }, [])
 
     const AddBrotherModal=  () => {
       return(

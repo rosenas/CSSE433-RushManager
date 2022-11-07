@@ -14,6 +14,14 @@ import bcrypt
 import json
 app = Flask(__name__)
 
+#temp values for rushees
+global rushees 
+rushees = []
+global events 
+events = []
+global brothers 
+brothers = []
+
 uri = "neo4j://localhost:7687"
 # uri= "neo4j://433-09.csse.rose-hulman.edu:7687"
 driver = GraphDatabase.driver(uri, auth=("neo4j", "password"))
@@ -46,13 +54,18 @@ def neoInit(tx):
 # print(res.total)
 
 import couchdb
-couch = couchdb.Server('http://admin:couch@137.112.104.178:5984/')
-# couch = None
-try:
-  db = couch['testdb']
-except:
-  db = None
-  print("couch down")
+db = None
+def couchInit():
+  global db
+  couch = couchdb.Server('http://admin:couch@137.112.104.178:5984/')
+  # couch = None
+  try:
+    db = couch['testdb']
+  except:
+    db = None
+    print("couch down")
+  
+couchInit()
 
 #137.112.104.255:7474
 
@@ -375,11 +388,14 @@ def redisSearch():
 
 @app.route("/login", methods = ['POST'])
 def login():
+  global db
   # redisAddRushee("Jared", "Petrisko")
   #queue("REDIS%&%addAsUser%&%rushee%&%" + "jake" + "%&%" + "jakey1")
-  
-  # redisGetRushees()
-  # redisGetBrothers()
+  couchInit()
+  print(db)
+  getRushees()
+  getBrothers()
+  getEvents()
   data = ""
   password = ""
   if request.method == 'POST':
@@ -389,7 +405,10 @@ def login():
   salt = bcrypt.gensalt()
   hash = bcrypt.hashpw("password".encode('utf-8'), salt)
   getQuery = {'selector': {'username': data.get('username')}}   
-  res = db.find(getQuery)
+  try:
+    res = db.find(getQuery)
+  except:
+    res = []
   user = None
   for doc in res:
     user = doc
@@ -418,14 +437,37 @@ def createUser():
 
 @app.route("/getRushees")
 def getRushees():
-  readQueue()
-  type = "rushee"
-  getQuery = {'selector': {'type': type}}
-  res = db.find(getQuery)
-  data = []
-  for doc in res:
-    data.append(doc)
-  return data
+  global rushees 
+#   couch = couchdb.Server('http://admin:couch@137.112.104.178:5984/')
+# # couch = None
+#   try:
+#     db = couch['testdb']
+#     print("Couch up")
+#   except:
+#     db = None
+#     print("couch down")
+#   print("GETTING rushees")
+#   print(db)
+#   try:
+  try:
+    readQueue()
+    type = "rushee"
+    getQuery = {'selector': {'type': type}}
+    res = db.find(getQuery)
+    data = []
+    for doc in res:
+      data.append(doc)
+    rushees = data
+    print("DB UP")
+    # print(rushees)
+  except:
+    None
+
+  return rushees
+  # except:
+  #   print("DB DOWN- return local copy")
+  #   print(rushees)
+  #   return rushees
 
 @app.route("/getOurRushees")
 def getOurRushees():
@@ -460,6 +502,7 @@ def addUser(data, type):
     "phone": data.get('phone'),
     "photoURL": data.get('photoURL')
     }
+    brothers.append(doc)
     queue("NEO4J%&%addInterests%&%brother%&%" + data.get('username') + "%&%" + data.get('first') + "%&%" + data.get('last') + "%&%" + json.dumps(data.get('interests')))
 
   elif(type == "rushee" or type == "requestedRushee"):
@@ -489,6 +532,7 @@ def addUser(data, type):
         }
       }
     }
+    rushees.append(doc)
     queue("NEO4J%&%addInterests%&%rushee%&%" + data.get('username') + "%&%" + data.get('first') + "%&%" + data.get('last') + "%&%" + json.dumps(data.get('interests')))
     queue("REDIS%&%addAsUser%&%rushee%&%" + data.get('first') + " " + data.get('last') + "%&%" + data.get('username'))
    
@@ -553,6 +597,8 @@ def makeBrotherAdmin():
 
 
 def couchChangeUserType(username, type):
+  #don't know if we want to deal with this offline
+  #would have to do stuff w/ requested vs not etc
   if not db:
     return False
   userQuery = {'selector': {'username': username}}
@@ -564,12 +610,17 @@ def couchChangeUserType(username, type):
 
 
 def couchAddUser(doc):
-  if not db:
+
+  couchInit()
+  try:
+  # if not db:
+  #   return False
+    res = db.save(doc)
+    #TODO 
+    #check what res returns if the save was unsuccessful
+    return True
+  except:
     return False
-  res = db.save(doc)
-  #TODO 
-  #check what res returns if the save was unsuccessful
-  return True
 
 @app.route("/deleteRushee", methods = ['POST'])
 def deleteRushee():
@@ -586,30 +637,47 @@ def deleteRushee():
   
   return "Rushee deleted"
 
-
 def couchDeleteRushee(data):
-  if not db:
+  print("DELETING" + data)
+  couchInit()
+  global rushees 
+  print(rushees)
+  for rushee in rushees:
+    print(rushee.get('username'))
+  rushees = list(filter(lambda rushee: rushee.get('username') != data.strip(), rushees))
+  for rushee in rushees:
+    print(rushee.get('username'))
+  
+  try:
+    userQuery = {'selector': {'$and': [{'type': "rushee"}, {'$or': [{'email': data}, {'username': data}]}]}}
+    res = db.find(userQuery)
+    for doc in res:
+      db.delete(doc)
+    #TODO 
+    #check what res returns if the save was unsuccessful
+    return True
+  except:
     return False
-  userQuery = {'selector': {'$and': [{'type': "rushee"}, {'$or': [{'email': data}, {'username': data}]}]}}
-  res = db.find(userQuery)
-  for doc in res:
-    db.delete(doc)
-  #TODO 
-  #check what res returns if the save was unsuccessful
-  return True
   
 
 @app.route("/getBrothers")
 def getBrothers():
-  readQueue()
-  type = "brother"
-  frat = "FIJI"
-  getQuery = {'selector': {'$or': [{'type': "brother"}, {'type': "admin"}, {'type': "requestedBrother"}]}}   
-  res = db.find(getQuery)
-  data = []
-  for doc in res:
-    data.append(doc)
-  return data
+  global brothers
+  try:
+    readQueue()
+    type = "brother"
+    frat = "FIJI"
+    getQuery = {'selector': {'$or': [{'type': "brother"}, {'type': "admin"}, {'type': "requestedBrother"}]}}   
+    res = db.find(getQuery)
+    data = []
+    for doc in res:
+      data.append(doc)
+    brothers = data
+    # return data
+  except:
+    None
+
+  return brothers
 
 @app.route("/addBrother", methods = ['POST'])
 def addBrother():
@@ -633,15 +701,25 @@ def deleteBrother():
 
 
 def couchDeleteBrother(data):
-  if not db:
+  couchInit()
+  global brothers 
+  print(brothers)
+  for brother in brothers:
+    print(brother.get('username'))
+  brothers = list(filter(lambda brother: brother.get('username') != data.strip(), brothers))
+  for brother in brothers:
+    print(brother.get('username'))
+  
+  try:
+    userQuery = {'selector': {'$and': [{'$or': [{'type': "brother"}, {'type': "requestedBrother"}]}, {'$or': [{'email': data}, {'username': data}]}]}}
+    res = db.find(userQuery)
+    for doc in res:
+      db.delete(doc)
+    #TODO 
+    #check what res returns if the save was unsuccessful
+    return True
+  except:
     return False
-  userQuery = {'selector': {'$and': [{'$or': [{'type': "brother"}, {'type': "requestedBrother"}]}, {'$or': [{'email': data}, {'username': data}]}]}}
-  res = db.find(userQuery)
-  for doc in res:
-    db.delete(doc)
-  #TODO 
-  #check what res returns if the save was unsuccessful
-  return True
 
 @app.route("/searchBrother")
 def searchBrother():
@@ -833,14 +911,31 @@ def getRusheesInterestedIn():
 
 @app.route("/getEvents")
 def getEvents():
-  readQueue()
-  type = "event"
-  getQuery = {'selector': {'type': type}}
-  res = db.find(getQuery)
-  data = []
-  for doc in res:
-    data.append(doc)
-  return data
+  global events
+#   couch = couchdb.Server('http://admin:couch@137.112.104.178:5984/')
+# # couch = None
+#   try:
+#     db = couch['testdb']
+#     print("Couch up")
+#   except:
+#     db = None
+#     print("couch down")
+#   print("GETTING events")
+#   print(db)
+  try:
+    readQueue()
+    type = "event"
+    getQuery = {'selector': {'type': type}}
+    res = db.find(getQuery)
+    data = []
+    for doc in res:
+      data.append(doc)
+    events = data
+    # return data
+  except:
+    None
+
+  return events
   
 
 @app.route("/addEvent", methods = ['POST'])
@@ -849,18 +944,21 @@ def addEvent():
   data = ""
   if request.method == 'POST':
     data = request.get_json()
+  
   queue("TODO%&%addEvent%&%" + data["name"] + "%&%" + data["date"])
   return {}
 
 def couchAddEvent(name, date):
-  if not db:
-    return False
   doc = {
     "type": "event",
     "name": name,
     "date": date,
     "attended": []
   }
+  events.append(doc)
+  if not db:
+    return False
+  
   res = db.save(doc)
   return True
 

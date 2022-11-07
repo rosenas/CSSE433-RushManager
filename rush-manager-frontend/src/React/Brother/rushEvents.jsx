@@ -1,5 +1,5 @@
 import React from "react";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Card from 'react-bootstrap/Card';
 import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
@@ -80,20 +80,23 @@ function RushEvents(props){
         handleClose()
     }
 
-    if(events.length == 0){
+    useEffect(() => {
         getEvents()
-        // fetch('http://localhost:8000/getEvents',{
-        //     headers : { 
-        //     'Content-Type': 'application/json',
-        //     'Accept': 'application/json'
-        //     }
-        // })
-        // .then(response=> response.json())
-        // .then(data=>{
-        //     //console.log(data)
-        //     setEvents(data)
-        // })
-    }
+      }, [])
+    // if(events.length == 0){
+    //     getEvents()
+    //     // fetch('http://localhost:8000/getEvents',{
+    //     //     headers : { 
+    //     //     'Content-Type': 'application/json',
+    //     //     'Accept': 'application/json'
+    //     //     }
+    //     // })
+    //     // .then(response=> response.json())
+    //     // .then(data=>{
+    //     //     //console.log(data)
+    //     //     setEvents(data)
+    //     // })
+    // }
 
     const AddRushEvent_Modal=  () => {
         return(

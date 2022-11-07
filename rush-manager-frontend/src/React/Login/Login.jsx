@@ -50,6 +50,9 @@ function Login({ setToken, setAccountType, setAccountInfo }, {}) {
             setAccountInfo(data)
             
         })
+        .catch(error => {
+            console.log("Couch Down")
+        })
         console.log(result)
         if(result.result) {
             setToken("valid")

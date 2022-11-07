@@ -11,6 +11,7 @@ import {default as Contact} from "../Rushee/contact"
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Button from 'react-bootstrap/Button'
 
+let loaded = false
 
 function MyRouter(){
 
@@ -18,6 +19,8 @@ function MyRouter(){
     const [accountType, setAccountType ] = useState()
     const [accountInfo, setAccountInfo] = useState();
     
+
+
 
     console.log(accountType)
 
@@ -37,7 +40,33 @@ function LoggedInRouter({accountType, setToken, accountInfo }){
     const [displaySearch, setDisplaySearch] = useState(false)
     const [searchRes, setSearchRes] = useState([])
     const [redisDown, setRedisDown] = useState(false)
+    // const [rushees, setRushees] = useState([])
 
+    // const getRushees = () => {
+    //     fetch('http://localhost:8000/getRushees', {
+    //       headers: {
+    //         'Content-Type': 'application/json',
+    //         'Accept': 'application/json'
+    //       }
+    //     })
+    //       .then(response => response.json())
+    //       .then(data => {
+    //         console.log("DATA")
+    //         console.log(data)
+    //         setRushees(data)
+    //         filterRushees(data)
+    //       })
+    //       .catch(error => {
+    //         console.log("ERROR IN COUCH")
+    
+    //       })
+    
+    //   }
+
+    // if(!loaded){
+    //     getRushees
+    //     loaded = true
+    // }
 
     const handleLogOut = () => {
         setToken("invalid")
@@ -64,7 +93,9 @@ function LoggedInRouter({accountType, setToken, accountInfo }){
 
                     <Route path="/contact" element={<Contact accountInfo= {accountInfo} accountType = {"admin"}/>}/>
 
-                    <Route path= "*" element={<ViewRushees setRedisDown={setRedisDown} redisDown={redisDown} searchRes={searchRes} displaySearch={displaySearch} setDisplaySearch={setDisplaySearch} setSearchRes={setSearchRes} accountInfo= {accountInfo} accountType = {"admin"}/>}/>
+                    <Route path= "*" element={<ViewRushees 
+                    // getRushees={getRushees} rushees={rushees} setRushees={setRushees} 
+                    setRedisDown={setRedisDown} redisDown={redisDown} searchRes={searchRes} displaySearch={displaySearch} setDisplaySearch={setDisplaySearch} setSearchRes={setSearchRes} accountInfo= {accountInfo} accountType = {"admin"}/>}/>
                 </Routes>
             </Router>
            
