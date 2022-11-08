@@ -250,9 +250,9 @@ function ViewRushees(props) {
 
 
   const handleSubmit = () => {
-    let tempRushees = rushees
-    tempRushees.push(doc)
-    setRushees(tempRushees)
+    // let tempRushees = rushees
+    // tempRushees.push(doc)
+    // setRushees(tempRushees)
     uploadFile(photo)
     // console.log(doc)
     fetch("http://localhost:8000/addRushee", {
@@ -495,7 +495,7 @@ function RusheeCard(props) {
 
   const handleSubmit = () => {
     const loggedInUsername = props.accountInfo.username
-    props.rushee.fraternityInfo["FIJI"].comments.push({'comment': comment, 'user': loggedInUsername})
+    // props.rushee.fraternityInfo["FIJI"].comments.push({'comment': comment, 'user': loggedInUsername})
     var info = { 'user': loggedInUsername, 'rushee': props.rushee.username, 'comment': comment}
     fetch("http://127.0.0.1:8000/addComment", {
       method: 'POST',
@@ -521,7 +521,7 @@ function RusheeCard(props) {
 
   const handleLike = () => {
     const loggedInUsername = props.accountInfo.username
-    props.rushee.fraternityInfo["FIJI"].likes.push(loggedInUsername)
+    // props.rushee.fraternityInfo["FIJI"].likes.push(loggedInUsername)
     // console.log(loggedInUsername)
     var info = { 'user': loggedInUsername, 'rushee': props.rushee.username }
     fetch("http://127.0.0.1:8000/likeRushee", {
@@ -542,7 +542,7 @@ function RusheeCard(props) {
     const loggedInUsername = props.accountInfo.username
     // let likes = props.rushee.fraternityInfo["FIJI"].likes
     // console.log(likes)
-    props.rushee.fraternityInfo["FIJI"].likes.filter((user)=>user!==loggedInUsername)
+    // props.rushee.fraternityInfo["FIJI"].likes.filter((user)=>user!==loggedInUsername)
     // console.log(likes)
     var info = { 'user': loggedInUsername, 'rushee': props.rushee.username }
     fetch("http://127.0.0.1:8000/dislikeRushee", {
@@ -606,7 +606,7 @@ function RusheeCard(props) {
   }
 
   const toggleBidStatus = () => {
-    props.rushee.fraternityInfo["FIJI"].bidStatus = !props.rushee.fraternityInfo["FIJI"].bidStatus 
+    // props.rushee.fraternityInfo["FIJI"].bidStatus = !props.rushee.fraternityInfo["FIJI"].bidStatus 
     var info = { 'query': props.rushee.username }
     fetch("http://localhost:8000/changeBid", {
       method: 'POST',
@@ -667,6 +667,7 @@ function RusheeCard(props) {
         props.getRushees()
       }
       )
+      // props.getRushees()
   }
 
   const [recs, setRecs] = useState([])

@@ -449,6 +449,8 @@ def getRushees():
 #   print("GETTING rushees")
 #   print(db)
 #   try:
+  # print("GET RUSHEES")
+  # print(rushees)
   try:
     readQueue()
     type = "rushee"
@@ -765,26 +767,28 @@ def changeFratInterest():
   inp = ""
   if request.method == 'POST':
     inp = request.get_json().get('body').get('query')
+  #update temp list
+  global rushees
+  newRushees = []
+  for rushee in rushees:
+    if(rushee.get('username') == inp):
+      rushee['fraternityInfo']["FIJI"]['interested'] = not rushee['fraternityInfo']["FIJI"]['interested']
+    newRushees.append(rushee)
+  rushees = newRushees
 
   queue("TODO%&%changeFratInterest%&%" + inp)
-  # rusheeQuery = {'selector': {'$and': [{'type': 'rushee'}, {'username': inp}]}}
-  # res = db.find(rusheeQuery)
-  # for row in res:
-  #   doc = db.get(row.id)
-  #   doc['fraternityInfo']["FIJI"]['interested'] = not doc['fraternityInfo']["FIJI"]['interested']
-  #   db.save(doc)
   return []
 
 def couchChangeFratInterest(username):
-  if not db:
-    return False
-  rusheeQuery = {'selector': {'$and': [{'type': 'rushee'}, {'username': username}]}}
-  res = db.find(rusheeQuery)
-  for row in res:
-    doc = db.get(row.id)
-    doc['fraternityInfo']["FIJI"]['interested'] = not doc['fraternityInfo']["FIJI"]['interested']
-    db.save(doc)
-  return True
+  try:
+    rusheeQuery = {'selector': {'$and': [{'type': 'rushee'}, {'username': username}]}}
+    res = db.find(rusheeQuery)
+    for row in res:
+      doc = db.get(row.id)
+      doc['fraternityInfo']["FIJI"]['interested'] = not doc['fraternityInfo']["FIJI"]['interested']
+      db.save(doc)
+    return True
+  except: return False
 
 
 @app.route("/likeRushee", methods = ['POST'])
@@ -794,19 +798,31 @@ def likeRushee():
     inp = request.get_json().get('body')
   rushee = inp.get('rushee')
   brother = inp.get('user')
+  global rushees
+  newRushees = []
+  for item in rushees:
+    if(item.get('username') == rushee):
+      temp = []
+      temp = item['fraternityInfo']["FIJI"]['likes']
+      temp.append(brother)
+      item['fraternityInfo']["FIJI"]['likes'] = temp
+    newRushees.append(item)
+  rushees = newRushees
+
   queue("TODO%&%likeRushee%&%" + brother + "%&%" + rushee)
   return []
 
 def couchLikeRushee(brother, rushee):
-  if not db:
+  try:
+    rusheeQuery = {'selector': {'$and': [{'type': 'rushee'}, {'username': rushee}]}}
+    res = db.find(rusheeQuery)
+    for row in res:
+      doc = db.get(row.id)
+      doc['fraternityInfo']["FIJI"]['likes'].append(brother)
+      db.save(doc)
+    return True
+  except:
     return False
-  rusheeQuery = {'selector': {'$and': [{'type': 'rushee'}, {'username': rushee}]}}
-  res = db.find(rusheeQuery)
-  for row in res:
-    doc = db.get(row.id)
-    doc['fraternityInfo']["FIJI"]['likes'].append(brother)
-    db.save(doc)
-  return True
 
 
 @app.route("/dislikeRushee", methods = ['POST'])
@@ -816,19 +832,33 @@ def dislikeRushee():
     inp = request.get_json().get('body')
   rushee = inp.get('rushee')
   brother = inp.get('user')
+
+  global rushees
+  newRushees = []
+  for item in rushees:
+    if(item.get('username') == rushee):
+      temp = []
+      temp = item['fraternityInfo']["FIJI"]['likes']
+      temp.remove(brother)
+      item['fraternityInfo']["FIJI"]['likes'] = temp
+    newRushees.append(item)
+  rushees = newRushees
+
+
+
   queue("TODO%&%dislikeRushee%&%" + brother + "%&%" + rushee)
   return []
 
 def couchDislikeRushee(brother, rushee):
-  if not db:
-    return False
-  rusheeQuery = {'selector': {'$and': [{'type': 'rushee'}, {'username': rushee}]}}
-  res = db.find(rusheeQuery)
-  for row in res:
-    doc = db.get(row.id)
-    doc['fraternityInfo']["FIJI"]['likes'].remove(brother)
-    db.save(doc)
-  return True
+  try:
+    rusheeQuery = {'selector': {'$and': [{'type': 'rushee'}, {'username': rushee}]}}
+    res = db.find(rusheeQuery)
+    for row in res:
+      doc = db.get(row.id)
+      doc['fraternityInfo']["FIJI"]['likes'].remove(brother)
+      db.save(doc)
+    return True
+  except: return False
 
 
 @app.route("/changeBid", methods = ['POST'])
@@ -836,45 +866,32 @@ def changeBid():
   inp = ""
   if request.method == 'POST':
     inp = request.get_json().get('body')
-  rushee = inp.get('query')
-  queue("TODO%&%changeBid%&%" + rushee)
+  inp = inp.get('query')
+
+  #update temp list
+  global rushees
+  newRushees = []
+  for rushee in rushees:
+    if(rushee.get('username') == inp):
+      rushee['fraternityInfo']["FIJI"]['bidStatus'] = not rushee['fraternityInfo']["FIJI"]['bidStatus']
+    newRushees.append(rushee)
+  rushees = newRushees
+  
+  queue("TODO%&%changeBid%&%" + inp)
   return []
 
 def couchChangeBid(rushee):
-  if not db:
+  try:
+    rusheeQuery = {'selector': {'$and': [{'type': 'rushee'}, {'username': rushee}]}}
+    res = db.find(rusheeQuery)
+    for row in res:
+      doc = db.get(row.id)
+      doc['fraternityInfo']["FIJI"]['bidStatus'] = not doc['fraternityInfo']["FIJI"]['bidStatus']
+      db.save(doc)
+    return True
+  except:
     return False
-  rusheeQuery = {'selector': {'$and': [{'type': 'rushee'}, {'username': rushee}]}}
-  res = db.find(rusheeQuery)
-  for row in res:
-    doc = db.get(row.id)
-    doc['fraternityInfo']["FIJI"]['bidStatus'] = not doc['fraternityInfo']["FIJI"]['bidStatus']
-    db.save(doc)
-  return True
 
-# @app.route("/addRating")
-# def addRating():
-#   #we dont use this on the front end yet 
-#   #need rushee's username, rating
-#   inp = ""
-#   rating = ""
-#   rusheeQuery = {'selector': {'$and': [{'type': 'rushee'}, {'$or': [{'email': inp}, {'username': inp}]}]}}
-#   res = db.find(rusheeQuery)
-#   for row in res:
-#     doc = db.get(row.id)
-#     doc['fraternityInfo']["FIJI"]['rating'] = rating
-#     db.save(doc)
-
-# @app.route("/needsDiscussion")
-# def needsDiscussion():
-#   #we dont use this on the front end yet 
-#   #need rushee's username
-#   inp = ""
-#   rusheeQuery = {'selector': {'$and': [{'type': 'rushee'}, {'$or': [{'email': inp}, {'username': inp}]}]}}
-#   res = db.find(rusheeQuery)
-#   for row in res:
-#     doc = db.get(row.id)
-#     doc['fraternityInfo']["FIJI"]['needsDiscussion'] = not doc['fraternityInfo']["FIJI"]['needsDiscussion']
-#     db.save(doc)
 
 @app.route("/addComment", methods = ['POST'])
 def addComment():
@@ -884,21 +901,36 @@ def addComment():
   rushee = inp.get('rushee')
   comment = inp.get('comment')
   user = inp.get('user')
+  commentobj = {'comment': comment, 'user': user}
+  global rushees
+  newRushees = []
+  for item in rushees:
+    if(item.get('username') == rushee):
+      temp = []
+      temp = item['fraternityInfo']["FIJI"]['comments']
+      temp.append(commentobj)
+      item['fraternityInfo']["FIJI"]['comments'] = temp
+    newRushees.append(item)
+  rushees = newRushees
+
+
+
   queue("TODO%&%addComment%&%" + rushee + "%&%" + user + "%&%" + comment )
   return {}
 
 def couchAddComment(rushee, user, comment):
-  if not db:
+  try:
+    rusheeQuery = {'selector': {'$and': [{'type': 'rushee'}, {'username': rushee}]}}
+    res = db.find(rusheeQuery)
+    comment = {'comment': comment, 'user': user}
+    for row in res:
+      doc = db.get(row.id)
+      doc['fraternityInfo']["FIJI"]['comments'].append(comment)
+      db.save(doc)
+      # print(doc)
+    return True
+  except:
     return False
-  rusheeQuery = {'selector': {'$and': [{'type': 'rushee'}, {'username': rushee}]}}
-  res = db.find(rusheeQuery)
-  comment = {'comment': comment, 'user': user}
-  for row in res:
-    doc = db.get(row.id)
-    doc['fraternityInfo']["FIJI"]['comments'].append(comment)
-    db.save(doc)
-    # print(doc)
-  return True
 
 @app.route("/changeRusheeInterest")
 def changeRusheeInterest():
