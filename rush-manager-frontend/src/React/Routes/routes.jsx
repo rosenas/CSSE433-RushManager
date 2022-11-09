@@ -40,33 +40,7 @@ function LoggedInRouter({accountType, setToken, accountInfo }){
     const [displaySearch, setDisplaySearch] = useState(false)
     const [searchRes, setSearchRes] = useState([])
     const [redisDown, setRedisDown] = useState(false)
-    // const [rushees, setRushees] = useState([])
-
-    // const getRushees = () => {
-    //     fetch('http://localhost:8000/getRushees', {
-    //       headers: {
-    //         'Content-Type': 'application/json',
-    //         'Accept': 'application/json'
-    //       }
-    //     })
-    //       .then(response => response.json())
-    //       .then(data => {
-    //         console.log("DATA")
-    //         console.log(data)
-    //         setRushees(data)
-    //         filterRushees(data)
-    //       })
-    //       .catch(error => {
-    //         console.log("ERROR IN COUCH")
     
-    //       })
-    
-    //   }
-
-    // if(!loaded){
-    //     getRushees
-    //     loaded = true
-    // }
 
     const handleLogOut = () => {
         setToken("invalid")
@@ -81,7 +55,7 @@ function LoggedInRouter({accountType, setToken, accountInfo }){
         return (
             <Router>
                 <div className="Navigation">
-                    <Navigation_Brother displaySearch={displaySearch} setDisplaySearch={setDisplaySearch} setSearchRes={setSearchRes} accountType = "admin"/>
+                    <Navigation_Brother displaySearch={displaySearch} setRedisDown={setRedisDown} setDisplaySearch={setDisplaySearch} setSearchRes={setSearchRes} accountType = "admin"/>
                     <Button className="LogOut_Button" onClick={handleLogOut}>Log out</Button>
                 </div>
                  <Routes>
@@ -127,17 +101,33 @@ function LoggedInRouter({accountType, setToken, accountInfo }){
         return (
             <Router>
                 <div className="Navigation">
-                    <Navigation_Brother accountType = "brother"/>
+                    <Navigation_Brother displaySearch={displaySearch} setRedisDown={setRedisDown} setDisplaySearch={setDisplaySearch} setSearchRes={setSearchRes} accountType = "brother"/>
                     <Button className="LogOut_Button" onClick={handleLogOut}>Log out</Button>
                 </div>
                  <Routes>
                     <Route path="/rushEvents" element={<RushEvents_Brother accountInfo= {accountInfo} accountType = {"brother"}/>}/>
 
-                    <Route path="/viewRushees" element={<ViewRushees accountInfo= {accountInfo} accountType = {"brother"}/>}/>
+                    <Route path="/viewRushees" element={<ViewRushees redisDown={redisDown} setRedisDown={setRedisDown} searchRes={searchRes} displaySearch={displaySearch} setDisplaySearch={setDisplaySearch} setSearchRes={setSearchRes} accountInfo= {accountInfo} accountType = {"brother"}/>}/>
 
                     <Route path="/viewBrothers" element={<ViewBrothers accountInfo= {accountInfo} accountType = {"brother"}/>}/>
 
-                    <Route path= "*" element={<ViewRushees accountInfo= {accountInfo} accountType = {"brother"}/>}/>
+                    <Route path= "*" element={<ViewRushees redisDown={redisDown} setRedisDown={setRedisDown} searchRes={searchRes} displaySearch={displaySearch} setDisplaySearch={setDisplaySearch} setSearchRes={setSearchRes} accountInfo= {accountInfo} accountType = {"brother"}/>}/>
+                </Routes>
+            </Router>
+           
+        )
+    }   else if (accountType == "requestedBrother"){
+
+        
+        
+        return (
+            <Router>
+                <div className="Navigation">
+                    <Navigation_Brother accountType = "requestedBrother"/>
+                    <Button className="LogOut_Button" onClick={handleLogOut}>Log out</Button>
+                </div>
+                <Routes>
+                    <Route path= "*" element={<Contact accountType = {"requestedBrother"} accountInfo= {accountInfo}/>}/>
                 </Routes>
             </Router>
            

@@ -4,11 +4,6 @@ from flask import request
 from flask import Flask
 from neo4j import GraphDatabase
 
-# from redisearch import Client
-
-import time
-import redis 
-# from redisearch import Client, TextField, NumericField, FT
 import redis 
 import bcrypt
 import json
@@ -22,36 +17,33 @@ events = []
 global brothers 
 brothers = []
 
-uri = "neo4j://localhost:7687"
-# uri= "neo4j://433-09.csse.rose-hulman.edu:7687"
-driver = GraphDatabase.driver(uri, auth=("neo4j", "password"))
-# driver = None
+# uri = "neo4j://localhost:7687"
+# driver = GraphDatabase.driver(uri, auth=("neo4j", "password"))
 
-
-def neoInit(tx):
+try:
+  print("TRYING")
+  driver = GraphDatabase.driver(encrypted=False, uri="bolt://433-09.csse.rose-hulman.edu:7687",auth=("neo4j", "h6u4%kr"))
+  print("DONE")
+except:
   None
-  # tx.run("CREATE (a:Interest {name: $football})", football = "clash")
-  # tx.run("CREATE (a:Interest {name:$football})", football = "basket")
-  # tx.run("CREATE (a:Interest {name:$football})", football = "ducks")
-  # tx.run("CREATE (a:Interest {name:$football})", football = "basketball")
-  # tx.run("CREATE (a:Interest {name:$football})", football = "golf")
-  # tx.run("CREATE (a:Interest {name:$football})", football = "gpe")
-  # tx.run("CREATE (a:Interest {name:$football})", football = "swimming")
-  # tx.run("CREATE (a:Interest {name:$football})", football = "gaming")
-  # tx.run("CREATE (a:Interest {name:$football})", football = "lifting")
-  # tx.run("CREATE (a:Interest {name:$football})", football = "running")
-  # tx.run("CREATE (a:Interest {name:$football})", football = "eating")
-  # tx.run("CREATE (a:Interest {name:$football})", football = "bickic")
+
+# def neoInit(tx):
+#   tx.run("CREATE (a:Interest {name: $football})", football = "clash")
+#   tx.run("CREATE (a:Interest {name:$football})", football = "basket")
+#   tx.run("CREATE (a:Interest {name:$football})", football = "ducks")
+#   tx.run("CREATE (a:Interest {name:$football})", football = "basketball")
+#   tx.run("CREATE (a:Interest {name:$football})", football = "golf")
+#   tx.run("CREATE (a:Interest {name:$football})", football = "gpe")
+#   tx.run("CREATE (a:Interest {name:$football})", football = "swimming")
+#   tx.run("CREATE (a:Interest {name:$football})", football = "gaming")
+#   tx.run("CREATE (a:Interest {name:$football})", football = "lifting")
+#   tx.run("CREATE (a:Interest {name:$football})", football = "running")
+#   tx.run("CREATE (a:Interest {name:$football})", football = "eating")
+#   tx.run("CREATE (a:Interest {name:$football})", football = "bickic")
 
 # with driver.session(database="neo4j") as session:
 #   res = session.execute_write(neoInit)
-# client = Client('myIndex')
-# FT.CREATE(idx:movie ON hash PREFIX 1 "movie:" SCHEMA title TEXT SORTABLE)
-# client.create_index([TextField('title', weight=5.0), TextField('body')])
-# client.add_document('doc1', title = 'RediSearch', body = 'Redisearch impements a search engine on top of redis')
-# res = client.search("search engine")
 
-# print(res.total)
 
 import couchdb
 db = None
@@ -60,17 +52,21 @@ def couchInit():
   couch = couchdb.Server('http://admin:couch@137.112.104.178:5984/')
   # couch = None
   try:
-    db = couch['testdb']
+    db = couch['shardtest']
+  #   doc = {"type": "Admin",
+  # "password": "$2b$12$f7wO2tTYQXL7q544OnjnnOlTqGKYg8h.SzBTjoiTl/RmsgJCLrmhG",
+  # "username": "admin"}
+  #   db.save(doc)
   except:
     db = None
     print("couch down")
   
 couchInit()
 
-#137.112.104.255:7474
+# redis = redis.Redis()
 
-redis = redis.Redis()
-# redis = None
+redis = redis.Redis(host="433-09.csse.rose-hulman.edu", port=6379 )
+
 redisRusheeHash = "rusheeHash"
 redisBrotherHash = "brotherHash"
 
@@ -197,17 +193,24 @@ def readQueue():
       elif(split[0] == "NEO4J"):
         if(split[1] == "addInterests"):
           res = False
+          # print("ADDINTERESTS")
           try:
-            with driver.session(database="neo4j") as session:
-              res = session.execute_write(neo4jAddUserAndInterests, split[2], split[3], split[4], split[5], split[6])
-          except: res = False
+            driver.verify_connectivity()
+            try:
+              with driver.session(database="neo4j") as session:
+                res = session.execute_write(neo4jAddUserAndInterests, split[2], split[3], split[4], split[5], split[6])
+            except: res = False
+          except:
+            # print("DRIVER NOT CONNECTED")
+            res = False
+          
           #res = neo4jAddInterests(split[2], split[3], split[4], split[5])
           if res:
             line = "DONE%&%" + split[1] + "%&%" + split[2] + "%&%" + split[3] + "%&%" + split[4] + "%&%" + split[5] + "%&%" + split[6]
             newFile.append(line)
           else:
+            # print(line)
             newFile.append(line)
-          None
         elif(split[1] == "deleteUser"):
           res = False
           try:
@@ -228,13 +231,21 @@ def readQueue():
     f.close()
   f = open("queue.txt", "wt")
   f.truncate(0)
+  # print(newFile)
   f.writelines(newFile)
+  f.close()
+  # print(newFile)
   return []
 
 
 def neo4jAddUserAndInterests(tx, type, username, first, last, interests):
-  if not driver:
+  try:
+    driver.verify_connectivity()
+  except:
+    # print("HERE")
     return False
+    # return ["NEO4J is down: recommendation feature not available"]
+
   interests = json.loads(interests)
   if(type == "rushee"):
     tx.run("CREATE (a:Rushee {username: $username, first: $first, last: $last})", 
@@ -255,6 +266,11 @@ def neo4jAddUserAndInterests(tx, type, username, first, last, interests):
   return True
 
 def neo4jDeleteUser(tx, type, username):
+  try:
+    driver.verify_connectivity()
+  except:
+    return False
+
   if not driver:
     return False
   # print(type + " " + username)
@@ -278,32 +294,47 @@ def neo4jDeleteUser(tx, type, username):
 @app.route("/getRecs", methods = ['POST'])
 def getRecs():
   # print("Get recs")
-  if not driver:
-    return ["NEO4J is down: recommendation feature not available"]
+  res = []
   if request.method == 'POST':
     data = request.get_json().get('body')
-    
   username = data.get('username')
-  res = []
-  with driver.session(database="neo4j") as session:
-    res = session.execute_read(neo4jGetBrotherRec, username)
+
+  try:
+    driver.verify_connectivity()
+  except:
+    return ["NEO4J is down: recommendation feature not available"]
+
+  try:
+    with driver.session(database="neo4j") as session:
+      res = session.execute_read(neo4jGetBrotherRec, username)
+  except:
+    print("HERE")
+    return ["NEO4J is down: recommendation feature not available"]
   return res
 
-def neo4jGetBrotherRec(tx, username):
-  res = tx.run("MATCH (r:Rushee {username: $username})-[i:interested_in]->(s:Interest)<-[in:interested_in]-(c:Brother) WITH r, c, count(*) as sum WHERE sum>3 RETURN sum, r, c.username", username=username)
-  data = []
-  for item in res:
-    #print(item["c.username"])
-    data.append(item["c.username"])
-  returnData = []
-  for user in data:
-    userQuery = {'selector': {'$and': [{'type': "brother"}, {'username': user}]}}
-    brother = db.find(userQuery)
-    for doc in brother:
-      returnData.append(doc)
 
-  # print(returnData)
-  return returnData
+def neo4jGetBrotherRec(tx, username):
+  try:
+    driver.verify_connectivity()
+  except:
+    return ["NEO4J is down: recommendation feature not available"]
+  
+  try:
+    res = tx.run("MATCH (r:Rushee {username: $username})-[i:interested_in]->(s:Interest)<-[in:interested_in]-(c:Brother) WITH r, c, count(*) as sum WHERE sum>3 RETURN sum, r, c.username", username=username)
+    data = []
+    for item in res:
+      data.append(item["c.username"])
+    returnData = []
+    for user in data:
+      userQuery = {'selector': {'$and': [{'type': "brother"}, {'username': user}]}}
+      brother = db.find(userQuery)
+      for doc in brother:
+        returnData.append(doc)
+
+    print(returnData)
+    return returnData
+  except:
+    return ["NEO4J is down: recommendation feature not available"]
   
 
 
@@ -347,22 +378,31 @@ def redisDeleteRushee(name, username):
 def redisSearch():
   # redis.sadd("j", "j")
   # redis.sadd("j", "jj")
-  if not redis:
-    return ["REDIS is currently down: search feature disabled"]
+  # if not redis:
+  #   return ["REDIS is currently down: search feature disabled"]
   if request.method == 'POST':
     data = request.get_json().get('body')
     
   name = data.get('body')
   # print(name)
-  res = redis.smembers(name)
+  try:
+    res = redis.smembers(name)
+  except:
+    return ["REDIS is currently down: search feature disabled"]
   data = []
-  for item in res:
-    # print(item.decode('utf-8'))
-    userQuery = {'selector': {'$and': [{'type': 'rushee'}, {'username': item.decode('utf-8')}]}}   
-    couch = db.find(userQuery)
-    for item in couch:
-      data.append(item)
-  # print(data)
+  try:
+    for item in res:
+      # print(item.decode('utf-8'))
+      userQuery = {'selector': {'$and': [{'type': 'rushee'}, {'username': item.decode('utf-8')}]}}   
+      couch = db.find(userQuery)
+      for item in couch:
+        data.append(item)
+  except:
+    for item in res:
+      for rushee in rushees:
+        if(rushee["username"] == item.decode('utf-8')):
+          data.append(rushee)
+
   return data
  
  
@@ -392,7 +432,6 @@ def login():
   # redisAddRushee("Jared", "Petrisko")
   #queue("REDIS%&%addAsUser%&%rushee%&%" + "jake" + "%&%" + "jakey1")
   couchInit()
-  print(db)
   getRushees()
   getBrothers()
   getEvents()
@@ -405,10 +444,11 @@ def login():
   salt = bcrypt.gensalt()
   hash = bcrypt.hashpw("password".encode('utf-8'), salt)
   getQuery = {'selector': {'username': data.get('username')}}   
+  res = []
   try:
     res = db.find(getQuery)
   except:
-    res = []
+    return {'result': False, 'accountType': "", 'username': "", 'message': "CouchDB is down."}
   user = None
   for doc in res:
     user = doc
@@ -427,7 +467,7 @@ def createUser():
   if request.method == 'POST':
     data = request.get_json().get('body')
 
-
+  # print(data)
   if(data.get('accountType') == "brother"):
     addUser(data, "requestedBrother")
   if(data.get('accountType') == "rushee"):
@@ -504,8 +544,10 @@ def addUser(data, type):
     "phone": data.get('phone'),
     "photoURL": data.get('photoURL')
     }
+    if(type == "requestedBrother"):
+      doc['type'] = "requestedBrother"
     brothers.append(doc)
-    queue("NEO4J%&%addInterests%&%brother%&%" + data.get('username') + "%&%" + data.get('first') + "%&%" + data.get('last') + "%&%" + json.dumps(data.get('interests')))
+    # queue("NEO4J%&%addInterests%&%brother%&%" + data.get('username') + "%&%" + data.get('first') + "%&%" + data.get('last') + "%&%" + json.dumps(data.get('interests')))
 
   elif(type == "rushee" or type == "requestedRushee"):
     doc = {
@@ -534,18 +576,25 @@ def addUser(data, type):
         }
       }
     }
+    if(type == "requestedRushee"):
+      doc['type'] = "rushee"
+      doc['fraternityInfo']["FIJI"]['interested'] = False
     rushees.append(doc)
-    queue("NEO4J%&%addInterests%&%rushee%&%" + data.get('username') + "%&%" + data.get('first') + "%&%" + data.get('last') + "%&%" + json.dumps(data.get('interests')))
-    queue("REDIS%&%addAsUser%&%rushee%&%" + data.get('first') + " " + data.get('last') + "%&%" + data.get('username'))
+    # queue("NEO4J%&%addInterests%&%rushee%&%" + data.get('username') + "%&%" + data.get('first') + "%&%" + data.get('last') + "%&%" + json.dumps(data.get('interests')))
+    # queue("REDIS%&%addAsUser%&%rushee%&%" + data.get('first') + " " + data.get('last') + "%&%" + data.get('username'))
    
-  if(type == "requestedRushee"):
-    doc['type'] = "requestedRushee"
-    doc['fraternityInfo']["FIJI"]['interested'] = False
+  # if(type == "requestedRushee"):
+  #   doc['type'] = "requestedRushee"
+  #   doc['fraternityInfo']["FIJI"]['interested'] = False
 
-  elif(type == "requestedBrother"):
-    doc['type'] = "requestedBrother"
+  # elif(type == "requestedBrother"):
+  #   doc['type'] = "requestedBrother"
   queue("TODO%&%" + "addUser%&%" + json.dumps(doc))
-  
+  if(type == "rushee" or type == "requestedRushee"):
+    queue("REDIS%&%addAsUser%&%rushee%&%" + data.get('first') + " " + data.get('last') + "%&%" + data.get('username'))
+    queue("NEO4J%&%addInterests%&%rushee%&%" + data.get('username') + "%&%" + data.get('first') + "%&%" + data.get('last') + "%&%" + json.dumps(data.get('interests')))
+  elif(type == "brother" or type == "requestedBrother"):
+    queue("NEO4J%&%addInterests%&%brother%&%" + data.get('username') + "%&%" + data.get('first') + "%&%" + data.get('last') + "%&%" + json.dumps(data.get('interests')))
   return True
 
 @app.route("/addRushee", methods = ['POST'])
@@ -592,7 +641,7 @@ def makeBrotherAdmin():
   if request.method == 'POST':
     data = request.get_json().get('body')
   data = data.get('query')
-  print(data)
+  # print(data)
   # print(data)
   queue("TODO%&%changeUserType%&%admin%&%" + data)
   return "Rushee added"
@@ -640,15 +689,15 @@ def deleteRushee():
   return "Rushee deleted"
 
 def couchDeleteRushee(data):
-  print("DELETING" + data)
+  # print("DELETING" + data)
   couchInit()
   global rushees 
-  print(rushees)
-  for rushee in rushees:
-    print(rushee.get('username'))
+  # print(rushees)
+  # for rushee in rushees:
+  #   # print(rushee.get('username'))
   rushees = list(filter(lambda rushee: rushee.get('username') != data.strip(), rushees))
-  for rushee in rushees:
-    print(rushee.get('username'))
+  # for rushee in rushees:
+  #   print(rushee.get('username'))
   
   try:
     userQuery = {'selector': {'$and': [{'type': "rushee"}, {'$or': [{'email': data}, {'username': data}]}]}}
@@ -705,12 +754,12 @@ def deleteBrother():
 def couchDeleteBrother(data):
   couchInit()
   global brothers 
-  print(brothers)
-  for brother in brothers:
-    print(brother.get('username'))
+  # print(brothers)
+  # for brother in brothers:
+  #   print(brother.get('username'))
   brothers = list(filter(lambda brother: brother.get('username') != data.strip(), brothers))
-  for brother in brothers:
-    print(brother.get('username'))
+  # for brother in brothers:
+  #   print(brother.get('username'))
   
   try:
     userQuery = {'selector': {'$and': [{'$or': [{'type': "brother"}, {'type': "requestedBrother"}]}, {'$or': [{'email': data}, {'username': data}]}]}}

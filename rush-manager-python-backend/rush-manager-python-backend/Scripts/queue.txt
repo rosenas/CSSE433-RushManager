@@ -1,10 +1,8 @@
-DONE%&%deleteRushee%&%miggy
-DONE%&%delUser%&%rushee%&%Miggy Robertson
-DONE%&%deleteUser%&%rushee%&%miggy
-DONE%&%addInterests%&%rushee%&%chris%&%Chris%&%S%&%{"football": false, "soccer": false, "baseball": false, "golf": true, "basketball": false, "gpe": false, "gaming": false, "swimming": false, "lifting": true, "running": false, "eating": false, "bickic": false, "clash": false, "basket": false, "ducks": false}
-DONE%&%addAsUser%&%rushee%&%Chris S%&%chris
-DONE%&%addUser%&%{"type": "rushee", "first": "Chris", "last": "S", "email": "u", "major": "u", "password": "$2b$12$XIMvPLRhnMzqIZ7xqe.HBud7mTswapBWe6d3JPR0j6Nu7sihiQGXy", "housing": "u", "interests": [], "interestedInFIJI": false, "username": "chris", "phone": "u", "photoURL": "https://rushee-images.s3.us-east-2.amazonaws.com/schletz.jpeg", "fraternityInfo": {"FIJI": {"frat": "FIJI", "bidStatus": false, "rating": "none", "comments": [], "likes": [], "interested": true, "needsDiscussion": false}}}
-DONE%&%changeRSVP%&%Casino Night%&%chris
-DONE%&%changeRSVP%&%Second Formals%&%chris
-DONE%&%changeRSVP%&%Bowling%&%chris
-TODO%&%addComment%&%chris%&%admin%&%Great kid
+DONE%&%deleteRushee%&%swanna
+DONE%&%delUser%&%rushee%&%Ethan Swanner
+DONE%&%deleteRushee%&%dylan
+DONE%&%delUser%&%rushee%&%Dylan Settles
+DONE%&%deleteUser%&%rushee%&%dylan
+DONE%&%addUser%&%{"type": "rushee", "first": "Ethan", "last": "Swanner", "email": "swanna@gmail.com", "major": "ME", "password": "$2b$12$s95TiJDm3u74z4w5133nueJFGWWBHshkddcRv99Kx8h4nBgfbuzlO", "housing": "Tub", "interests": [], "interestedInFIJI": false, "username": "swanna", "phone": "233-323-2431", "photoURL": "https://rushee-images.s3.us-east-2.amazonaws.com/Swanna.jpeg", "fraternityInfo": {"FIJI": {"frat": "FIJI", "bidStatus": false, "rating": "none", "comments": [], "likes": [], "interested": true, "needsDiscussion": false}}}
+DONE%&%addAsUser%&%rushee%&%Ethan Swanner%&%swanna
+DONE%&%addInterests%&%rushee%&%swanna%&%Ethan%&%Swanner%&%{"football": true, "soccer": false, "baseball": true, "golf": true, "basketball": true, "gpe": false, "gaming": true, "swimming": false, "lifting": true, "running": false, "eating": true, "bickic": false, "clash": true, "basket": false, "ducks": true}

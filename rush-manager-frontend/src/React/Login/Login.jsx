@@ -1,7 +1,8 @@
 import React from 'react'
+import Popup from 'reactjs-popup';
 import { useState } from 'react'
 import Modal from 'react-bootstrap/Modal'
-import { FormCheck } from "react-bootstrap";
+import { FormCheck, ToggleButton, ToggleButtonGroup } from "react-bootstrap";
 import Button from 'react-bootstrap/Button'
 import AWS from 'aws-sdk'
 
@@ -28,6 +29,8 @@ function Login({ setToken, setAccountType, setAccountInfo }, {}) {
     const [loginRes, setLoginRes] = useState();
     const [progress, setProgress] = useState(0);
     const [selectedFile, setSelectedFile] = useState(null);
+    const [couchDown, setCouchDown] = useState(false)
+    const [noUser, setNoUser] = useState(false)
 
     const handleSubmit = async e => {
         e.preventDefault();
@@ -48,10 +51,16 @@ function Login({ setToken, setAccountType, setAccountInfo }, {}) {
         .then(data => {
             result = data
             setAccountInfo(data)
-            
+            if(data.message === "No user found.") {
+                setNoUser(true)
+            } else if(data.message === "CouchDB is down.") {
+                setCouchDown(true)
+                
+            }
         })
         .catch(error => {
             console.log("Couch Down")
+
         })
         console.log(result)
         if(result.result) {
@@ -63,6 +72,8 @@ function Login({ setToken, setAccountType, setAccountInfo }, {}) {
 
 
     }
+
+
     let photo;
     const handleSetPhoto = (_photo) => {
       console.log(photo);
@@ -71,6 +82,14 @@ function Login({ setToken, setAccountType, setAccountInfo }, {}) {
     const handleCreateAccount = () => {
         setModal(true)
 
+    }
+
+    const handleCloseCouchDown = () => {
+        setCouchDown(false)
+    }
+
+    const handleCloseNoUser = () => {
+        setNoUser(false)
     }
 
     const handleClose = () => {
@@ -93,6 +112,15 @@ function Login({ setToken, setAccountType, setAccountInfo }, {}) {
     // }
 
     const [modal, setModal] = useState(false)
+    const [unique, setUnique] = useState(false)
+    const [usernameColor, setUsernameColor] = useState("green")
+    const [rushee, setRushee] = useState(false)
+    const [brother, setBrother] = useState(true)
+
+
+
+
+    let uniqueVar = "green"
     
     var doc = {'first': "",
             'requested': true,
@@ -124,11 +152,57 @@ function Login({ setToken, setAccountType, setAccountInfo }, {}) {
           }
         };
 
+    
+        const handleSelectBrother = () => {
+            setBrother(true)
+            setRushee(false)
+            doc.accountType = "brother"
+        }
+    
+        const handleSelectRushee = () => {
+            setBrother(false)
+            setRushee(true)
+            doc.accountType = "rushee"
+        }
+
+    const checkUniqueUsername = () => {
+            fetch("http://localhost:8000/isUniqueUserName", {
+                      method: 'POST',
+                      headers: {
+                          'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify(doc)
+                  }).then(response => response.json())
+                  .then(data => {
+                      let result = data
+                      
+                      if(result.isUnique) {
+                        console.log("Unique")
+                        uniqueVar = "green"
+                        // setUnique(true)
+                        // setUsernameColor("green")
+                      } else {
+                        console.log("Not unique")
+                        uniqueVar = "red"
+                        // setUnique(false)
+                        // setUsernameColor("red")
+                      }
+                  })
+                  
+          
+          
+              }
 
     const handleSubmitCreateUser = () => {
         console.log("NEW USER")
         uploadFile(photo)
         console.log(doc)
+        if(rushee) {
+            doc.accountType = "rushee"
+
+        } else if(brother) {
+            doc.accountType = "brother"
+        }
         fetch("http://localhost:8000/createUser", {
                   method: 'POST',
                   headers: {
@@ -147,6 +221,8 @@ function Login({ setToken, setAccountType, setAccountInfo }, {}) {
       
       
           }
+
+    
     
     const uploadFile = (file) => {
             doc.photoURL = "https://rushee-images.s3.us-east-2.amazonaws.com/" + encodeURIComponent(file.name)
@@ -165,6 +241,32 @@ function Login({ setToken, setAccountType, setAccountInfo }, {}) {
                 if (err) console.log(err)
               })
           }
+
+    const CouchDownPopup = () => {
+            return (
+                
+                <Modal show={couchDown} onHide={handleCloseCouchDown} position="right center">
+                    <Modal.Header closeButton/>
+                    <Modal.Title className='Modal-Title'>Couch DB is currently down</Modal.Title>
+                    <Modal.Body>
+                        <div>
+                        Login services disabled
+                        </div>
+                    </Modal.Body>
+                </Modal>
+            )}
+
+    const NoUserFoundPopup = () => {
+        return (
+                    
+            <Modal show={noUser} onHide={handleCloseNoUser} position="right center">
+                <Modal.Header closeButton/>
+                <Modal.Title className='Modal-Title'>No user found</Modal.Title>
+                <Modal.Body>
+                    
+                </Modal.Body>
+            </Modal>
+        )}
     
     const CreateAccount_Modal = () => {
         return (
@@ -174,13 +276,21 @@ function Login({ setToken, setAccountType, setAccountInfo }, {}) {
                 <Modal.Body>
                     <div>
                         <div className='Modal-Input'>
+                        <ToggleButtonGroup
+                            color="primary"
+                            name="acctype"
+                            style = {{width: "50px"}}
+                            aria-label="Platform"
+                            >
+                                <ToggleButton active={brother} onClick={handleSelectBrother} value="brother">Brother</ToggleButton>
+                                <ToggleButton active={rushee} onClick={handleSelectRushee} value="rushee">Rushee</ToggleButton>
+                            </ToggleButtonGroup>
                             <label for="Username"><b>Username</b></label>
-                            <input type="text" placeholder="Username" name="Username" onChange={e => doc.username = e.target.value} required/>
+                            <input type="text" style={{color: uniqueVar}} placeholder="Username" name="Username" onChange={e => {doc.username = e.target.value
+                            checkUniqueUsername()}} required/>
 
                             <label for="Password"><b>Password</b></label>
                             <input type="password" placeholder="Password" name="Password" onChange={e => doc.password = e.target.value} required/>
-                            <label for="AccountType"><b>Account Type</b></label>
-                            <input type="text" placeholder="Account Type" name="AccountType" onChange={e => doc.accountType = e.target.value} required/>
                             <label for="First"><b>First Name</b></label>
                             <input type="text" placeholder="First" name="first" onChange={e => doc.first = e.target.value} required/>
                             <label for="Last"><b>Last Name</b></label>
@@ -299,6 +409,8 @@ function Login({ setToken, setAccountType, setAccountInfo }, {}) {
                 <Button variant="light" onClick={handleCreateAccount}>Create Account</Button>
             </div>
             <CreateAccount_Modal />
+            <CouchDownPopup/>
+            <NoUserFoundPopup/>
         </>
 
     )

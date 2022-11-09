@@ -7,11 +7,13 @@ import Popup from 'reactjs-popup';
 import { useState } from 'react';
 
 function Navigation(props){
-    
     let searchValue = ""
+    console.log("NAV PROPS")
+    console.log(props)
     // const [searchRushees, setSearchRushees] = useState(false)
     const [search, setSearch] = useState("")
-    const handleSearch = () => {
+    const handleSearch = event => {
+        
     let data = {'body': search}
     fetch("http://127.0.0.1:8000/searchRushee", {
       method: 'POST',
@@ -27,33 +29,43 @@ function Navigation(props){
             console.log(data[0])
             props.setRedisDown(true)
         } else{
+            console.log("DATA")
+            console.log(data)
             props.setDisplaySearch(true)
             props.setSearchRes(data)
+            console.log(props.dis)
+
+
         }
           
       })
     }
 
     return (
+       
         <Nav variant="tabs">
+            {console.log(props)}
+             {props.accountType !== "requestedBrother" &&
              <Nav.Item>
                 <Nav.Link >
                     <NavLink to="/rushees" >Rushees</NavLink>
                 </Nav.Link>
-            </Nav.Item>
+            </Nav.Item>}
+            {props.accountType !== "requestedBrother" &&
             <Nav.Item>
                 <Nav.Link>
                     <NavLink to="/rushEvents">Rush Events</NavLink> 
                 </Nav.Link>
-            </Nav.Item>
+            </Nav.Item>}
             
-           
+            {props.accountType !== "requestedBrother" &&
             <Nav.Item>
             <Nav.Link>
                 <NavLink to="/viewBrothers">Brothers</NavLink> 
             </Nav.Link>
 
-        </Nav.Item>
+        </Nav.Item>}
+        
             
             {props.accountType === "admin" &&
             <Nav.Item>
@@ -62,19 +74,23 @@ function Navigation(props){
             </Nav.Link>
         </Nav.Item>
             }
+
+{props.accountType !== "requestedBrother" &&
             <Form>
             <Form.Control
               type="search"
-              placeholder="Search"
+              placeholder="Search for Rushee"
               className="search_bar form-control"
               aria-label="Search"
               onChange={e => setSearch(e.target.value)}
+            //   onSubmit={handleSearch} 
             //   onChange={e => searchValue = e.target.value}
             />
-            </Form>
-            <Button variant="outline-secondary" className="search_button" onClick={handleSearch}>
+            </Form>}
+            {props.accountType !== "requestedBrother" &&
+            <Button type="submit" variant="outline-secondary" className="search_button" onClick={handleSearch}>
                 Search
-            </Button>
+            </Button>}
         </Nav>
     )
 

@@ -295,17 +295,25 @@ function ViewRushees(props) {
     'bickic': false,
   })
 
+  const handleCloseRedisDown = () => {
+    props.setRedisDown(false)
+}
+
+  const RedisDownPopup = () => {
+    return (
+        
+        <Modal show={props.redisDown} onHide={handleCloseRedisDown} position="right center">
+            <Modal.Header closeButton/>
+            <Modal.Title className='Modal-Title'>Redis currently down</Modal.Title>
+            <Modal.Body>
+                <div>
+                Search services disabled
+                </div>
+            </Modal.Body>
+        </Modal>
+    )}
 
   
-
-  const redisDownPopup = () => {
-    return (
-      
-      <Popup>
-        <div>POPUP</div>
-      </Popup>
-    )
-  }
 
   const AddRushEvent_Rushee = () => {
     return (
@@ -460,19 +468,22 @@ function ViewRushees(props) {
           <ToggleButton active={rusheesWithBids} value="bids" onClick={handleRusheesWithBids} >Bids</ToggleButton>
         </ToggleButtonGroup>
       </div>
-      <div className="container">
-      {props.redisDown && <redisDownPopup></redisDownPopup>}
-        {console.log(props.displaySearch)}
-        {console.log(rushees)}
-        {props.displaySearch && props.searchRes.map((rushee) => <RusheeCard rushees={rushees} setRushees={setRushees} removeLocally={removeRusheeLocally} events={events} accountInfo={props.accountInfo} rushee={rushee} rusheesWithBids={rusheesWithBids} ourRushees={ourRushees} allRushees={allRushees} getRushees={getRushees} accountType={props.accountType} />)}
-        {rushees && !props.displaySearch && filteredRusheeList.map((rushee) => <RusheeCard  rushees={rushees} setRushees={setRushees} removeLocally={removeRusheeLocally} events={events} accountInfo={props.accountInfo} rushee={rushee} rusheesWithBids={rusheesWithBids} ourRushees={ourRushees} allRushees={allRushees} getRushees={getRushees} accountType={props.accountType} />)}
-      </div>
       {
         props.accountType === "admin" &&
         <div className="add">
           <Button variant="light" className="add_button" onClick={handleAddRushee}>Add Rushee</Button>
         </div>
       }
+      <div className="container">
+      {props.redisDown && <RedisDownPopup></RedisDownPopup>}
+        {console.log("HERE")}
+        {console.log(props)}
+        {console.log(props.displaySearch)}
+        {console.log(rushees)}
+        {props.displaySearch && props.searchRes.map((rushee) => <RusheeCard rushees={rushees} setRushees={setRushees} removeLocally={removeRusheeLocally} events={events} accountInfo={props.accountInfo} rushee={rushee} rusheesWithBids={rusheesWithBids} ourRushees={ourRushees} allRushees={allRushees} getRushees={getRushees} accountType={props.accountType} />)}
+        {rushees && !props.displaySearch && filteredRusheeList.map((rushee) => <RusheeCard  rushees={rushees} setRushees={setRushees} removeLocally={removeRusheeLocally} events={events} accountInfo={props.accountInfo} rushee={rushee} rusheesWithBids={rusheesWithBids} ourRushees={ourRushees} allRushees={allRushees} getRushees={getRushees} accountType={props.accountType} />)}
+      </div>
+      
       <AddRushEvent_Rushee />
     </>
   )
@@ -683,6 +694,7 @@ function RusheeCard(props) {
   })
   .then(response => response.json())
   .then(data => {
+    console.log("RECS")
     console.log(data)
     setRecs(data)
   })
