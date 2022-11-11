@@ -68,7 +68,7 @@ function ViewRushees(props) {
 
     const [progress, setProgress] = useState(0);
     const [selectedFile, setSelectedFile] = useState(null);
-
+    const [notUnique, setNotUnique] = useState(false)
     
 
    
@@ -181,6 +181,7 @@ function ViewRushees(props) {
   }
 
   const handleAddRushee = () => {
+    setNotUnique(false)
     setModal(true)
   }
 
@@ -200,7 +201,7 @@ function ViewRushees(props) {
 
   let photo;
   const handleSetPhoto = (_photo) => {
-    console.log(photo);
+    // console.log(photo);
     photo = _photo
   }
 
@@ -262,11 +263,21 @@ function ViewRushees(props) {
       },
       body: JSON.stringify(doc)
     })
-      .then(respnse => {
-        getRushees()
-        handleClose()
-      }
-      )
+      .then(response => response.json())
+      .then(data=>{
+        
+        if(data[0] === "Not a unique username") {
+          console.log("NOT UNIQUE")
+          console.log(notUnique)
+          setNotUnique(true)
+          console.log(notUnique)
+        } else {
+          setNotUnique(false)
+          getRushees()
+          handleClose()
+        }
+        console.log(data);
+    })
   }
 
   const removeRusheeLocally = (rushee) => {
@@ -299,6 +310,12 @@ function ViewRushees(props) {
     props.setRedisDown(false)
 }
 
+
+
+const handleCloseNotUnique = () => {
+  setNotUnique(false)
+}
+
   const RedisDownPopup = () => {
     return (
         
@@ -313,7 +330,20 @@ function ViewRushees(props) {
         </Modal>
     )}
 
-  
+    const NotUniqueUsernamePopup = () => {
+      return (
+          
+          <Modal show={notUnique} onHide={handleCloseNotUnique} position="right center">
+              <Modal.Header closeButton/>
+              <Modal.Title className='Modal-Title'>Not a unique username</Modal.Title>
+              <Modal.Body>
+                {console.log("POPUP")}
+                  <div>
+                  Please try a different username
+                  </div>
+              </Modal.Body>
+          </Modal>
+      )}
 
   const AddRushEvent_Rushee = () => {
     return (
@@ -326,22 +356,25 @@ function ViewRushees(props) {
           <div>
 
             <div className="Modal-Input">
+              
+            
               <label for="Event"><b>First Name</b></label>
-              <input type="text" placeholder="Enter Rushee Name" name="Rushee Name" onChange={e => doc.first = e.target.value} required />
+              <input type="text" placeholder="Enter First Name" name="Rushee Name" onChange={e => doc.first = e.target.value} required />
               <label for="Event"><b>Last Name</b></label>
-              <input type="text" placeholder="Enter Rushee Name" name="Rushee Name" onChange={e => doc.last = e.target.value} required />
+              <input type="text" placeholder="Enter Last Name" name="Rushee Name" onChange={e => doc.last = e.target.value} required />
+              {notUnique && <div>Not a unique username!</div>}
               <label for="Event"><b>Username</b></label>
-              <input type="text" placeholder="Enter Rushee Name" name="Rushee Name" onChange={e => doc.username = e.target.value} required />
+              <input type="text" placeholder="Enter Username" name="Rushee Name" onChange={e => doc.username = e.target.value} required />
               <label for="Event"><b>Password</b></label>
               <input type="password" placeholder="Enter Password" name="Rushee Name" onChange={e => doc.password = e.target.value} required />
               <label for="Event"><b>Email</b></label>
-              <input type="text" placeholder="Enter Rushee Name" name="Rushee Name" onChange={e => doc.email = e.target.value} required />
+              <input type="text" placeholder="Enter Email" name="Rushee Name" onChange={e => doc.email = e.target.value} required />
               <label for="Event"><b>Phone Number</b></label>
-              <input type="text" placeholder="Enter Rushee Name" name="Rushee Name" onChange={e => doc.phone = e.target.value} required />
+              <input type="text" placeholder="Enter Phone Number" name="Rushee Name" onChange={e => doc.phone = e.target.value} required />
               <label for="Event"><b>Major</b></label>
-              <input type="text" placeholder="Enter Rushee Name" name="Rushee Name" onChange={e => doc.major = e.target.value} required />
-              <label for="Event"><b>ResHall</b></label>
-              <input type="text" placeholder="Enter Rushee Name" name="Rushee Name" onChange={e => doc.housing = e.target.value} required />
+              <input type="text" placeholder="Enter Major" name="Rushee Name" onChange={e => doc.major = e.target.value} required />
+              <label for="Event"><b>Residence Hall</b></label>
+              <input type="text" placeholder="Enter Residence Hall" name="Rushee Name" onChange={e => doc.housing = e.target.value} required />
               <label for="Date"><b>Photo</b></label>
               <input type="file" placeholder="Upload Photo" name="photo" onChange={e => handleSetPhoto(e.target.files[0])} required />          
               <div>
@@ -448,11 +481,13 @@ function ViewRushees(props) {
               <Button variant="primary" onClick={handleSubmit}>Add</Button>
             </div>
           </div>
+          
         </Modal.Body>
+        
       </Modal>
+      
     )
   }
-
   return (
     <>
       <h1 className="title">Rushees</h1>
@@ -476,10 +511,6 @@ function ViewRushees(props) {
       }
       <div className="container">
       {props.redisDown && <RedisDownPopup></RedisDownPopup>}
-        {console.log("HERE")}
-        {console.log(props)}
-        {console.log(props.displaySearch)}
-        {console.log(rushees)}
         {props.displaySearch && props.searchRes.map((rushee) => <RusheeCard rushees={rushees} setRushees={setRushees} removeLocally={removeRusheeLocally} events={events} accountInfo={props.accountInfo} rushee={rushee} rusheesWithBids={rusheesWithBids} ourRushees={ourRushees} allRushees={allRushees} getRushees={getRushees} accountType={props.accountType} />)}
         {rushees && !props.displaySearch && filteredRusheeList.map((rushee) => <RusheeCard  rushees={rushees} setRushees={setRushees} removeLocally={removeRusheeLocally} events={events} accountInfo={props.accountInfo} rushee={rushee} rusheesWithBids={rusheesWithBids} ourRushees={ourRushees} allRushees={allRushees} getRushees={getRushees} accountType={props.accountType} />)}
       </div>

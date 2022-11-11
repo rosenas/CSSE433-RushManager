@@ -145,18 +145,12 @@ function ViewBrothers(props){
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(doc)
-        })
-        .then(respnse =>{
-                console.log(respnse)
-               
-                //close the modal
-                getBrothers()
-                
-                
-              handleClose()
-            }
-        )
-
+        }).then(response => response.json())
+        .then(data=>{
+          getBrothers()      
+          handleClose()
+          console.log(data);
+      })
 
     }
 
@@ -183,21 +177,21 @@ function ViewBrothers(props){
                     
                       <div className="Modal-Input">
                           <label for="Event"><b>First Name</b></label>
-                          <input type="text" placeholder="Enter Brother Name" name="Brother Name" onChange={e => doc.first = e.target.value} required />
+                          <input type="text" placeholder="Enter First Name" name="Brother Name" onChange={e => doc.first = e.target.value} required />
                           <label for="Event"><b>Last Name</b></label>
-                          <input type="text" placeholder="Enter Brother Name" name="Brother Name" onChange={e => doc.last = e.target.value} required />
+                          <input type="text" placeholder="Enter Last Name" name="Brother Name" onChange={e => doc.last = e.target.value} required />
                           <label for="Event"><b>Username</b></label>
-                          <input type="text" placeholder="Enter Brother Name" name="Brother Name" onChange={e => doc.username = e.target.value} required />
+                          <input type="text" placeholder="Enter Username" name="Brother Name" onChange={e => doc.username = e.target.value} required />
                           <label for="Event"><b>Password</b></label>
-                          <input type="text" placeholder="Password" name="Brother Name" onChange={e => doc.password = e.target.value} required />
+                          <input type="text" placeholder="Enter Password" name="Brother Name" onChange={e => doc.password = e.target.value} required />
                           <label for="Event"><b>Email</b></label>
-                          <input type="text" placeholder="Enter Brother Name" name="Brother Name" onChange={e => doc.email = e.target.value} required />
+                          <input type="text" placeholder="Enter Email" name="Brother Name" onChange={e => doc.email = e.target.value} required />
                           <label for="Event"><b>Phone Number</b></label>
-                          <input type="text" placeholder="Enter Brother Name" name="Brother Name" onChange={e => doc.phone = e.target.value} required />
+                          <input type="text" placeholder="Enter Phone Number" name="Brother Name" onChange={e => doc.phone = e.target.value} required />
                           <label for="Event"><b>Major</b></label>
-                          <input type="text" placeholder="Enter Brother Name" name="Brother Name" onChange={e => doc.major = e.target.value} required />
-                          <label for="Event"><b>ResHall</b></label>
-                          <input type="text" placeholder="Enter Brother Name" name="Brother Name" onChange={e => doc.housing = e.target.value} required />
+                          <input type="text" placeholder="Enter Major" name="Brother Name" onChange={e => doc.major = e.target.value} required />
+                          <label for="Event"><b>Residence Hall</b></label>
+                          <input type="text" placeholder="Enter Residence Hall" name="Brother Name" onChange={e => doc.housing = e.target.value} required />
                           <label for="Date"><b>Photo</b></label>
                           <input type="file" placeholder="Upload Photo" name="photo" onChange={e => handleSetPhoto(e.target.files[0])} required />
                           <div>
@@ -305,6 +299,10 @@ function ViewBrothers(props){
     return (
         <>
         <h1 className="title">Brothers</h1>
+
+        {props.accountType === "admin" &&
+        <>
+        
         <div className= "add">
         <ToggleButtonGroup
           color="primary"
@@ -317,12 +315,13 @@ function ViewBrothers(props){
         <ToggleButton active={ourBrothers} onClick={handleOurBrothers} value="all">Our Brothers</ToggleButton>
         <ToggleButton active={requestedBrothers} value="ourList" onClick={handleRequestedBrothers} >Requested Brothers</ToggleButton>
       </ToggleButtonGroup>
-      
+        
         </div>
-        {props.accountType === "admin" &&
         <div className= "add">
             <Button variant="light" className="add_button"onClick={handleAddBrother}>Add Brother</Button>
-        </div>}
+        </div>
+        </>
+        }
         <div className="container">
         
          {brothers && ourBrothers && brothers.map((brother) => <BrotherCard brother={brother} getBrothers = {getBrothers} accountType = {props.accountType}/>)}

@@ -120,7 +120,7 @@ function Login({ setToken, setAccountType, setAccountInfo }, {}) {
 
 
 
-    let uniqueVar = "green"
+    // let uniqueVar = "green"
     
     var doc = {'first': "",
             'requested': true,
@@ -165,33 +165,6 @@ function Login({ setToken, setAccountType, setAccountInfo }, {}) {
             doc.accountType = "rushee"
         }
 
-    const checkUniqueUsername = () => {
-            fetch("http://localhost:8000/isUniqueUserName", {
-                      method: 'POST',
-                      headers: {
-                          'Content-Type': 'application/json',
-                      },
-                      body: JSON.stringify(doc)
-                  }).then(response => response.json())
-                  .then(data => {
-                      let result = data
-                      
-                      if(result.isUnique) {
-                        console.log("Unique")
-                        uniqueVar = "green"
-                        // setUnique(true)
-                        // setUsernameColor("green")
-                      } else {
-                        console.log("Not unique")
-                        uniqueVar = "red"
-                        // setUnique(false)
-                        // setUsernameColor("red")
-                      }
-                  })
-                  
-          
-          
-              }
 
     const handleSubmitCreateUser = () => {
         console.log("NEW USER")
@@ -209,17 +182,12 @@ function Login({ setToken, setAccountType, setAccountInfo }, {}) {
                       'Content-Type': 'application/json',
                   },
                   body: JSON.stringify(doc)
-              })
-              .then(respnse =>{
-                      console.log(respnse)
-                     
-                      //close the modal
-                      setModal(false)
-                    //handleClose()
-                  }
-              )
-      
-      
+              }).then(response => response.json())
+              .then(data=>{
+                setModal(false)
+                console.log("HERE")
+                console.log(data);
+            })
           }
 
     
@@ -286,23 +254,24 @@ function Login({ setToken, setAccountType, setAccountInfo }, {}) {
                                 <ToggleButton active={rushee} onClick={handleSelectRushee} value="rushee">Rushee</ToggleButton>
                             </ToggleButtonGroup>
                             <label for="Username"><b>Username</b></label>
-                            <input type="text" style={{color: uniqueVar}} placeholder="Username" name="Username" onChange={e => {doc.username = e.target.value
-                            checkUniqueUsername()}} required/>
+                            <input type="text" placeholder="Enter Username" name="Username" onChange={e => {doc.username = e.target.value
+                            // checkUniqueUsername()
+                            }} required/>
 
                             <label for="Password"><b>Password</b></label>
-                            <input type="password" placeholder="Password" name="Password" onChange={e => doc.password = e.target.value} required/>
+                            <input type="password" placeholder="Enter Password" name="Password" onChange={e => doc.password = e.target.value} required/>
                             <label for="First"><b>First Name</b></label>
-                            <input type="text" placeholder="First" name="first" onChange={e => doc.first = e.target.value} required/>
+                            <input type="text" placeholder="Enter First Name" name="first" onChange={e => doc.first = e.target.value} required/>
                             <label for="Last"><b>Last Name</b></label>
-                            <input type="text" placeholder="Last" name="Last" onChange={e => doc.last = e.target.value} required/>
+                            <input type="text" placeholder="Enter Last Name" name="Last" onChange={e => doc.last = e.target.value} required/>
                             <label for="Email"><b>Email</b></label>
-                            <input type="text" placeholder="Email" name="Email" onChange={e => doc.email = e.target.value} required/>
+                            <input type="text" placeholder="Enter Email" name="Email" onChange={e => doc.email = e.target.value} required/>
                             <label for="Phone"><b>Phone Number</b></label>
-                            <input type="text" placeholder="Phone" name="Phone" onChange={e => doc.phone = e.target.value} required/>
+                            <input type="text" placeholder="Enter Phone Number" name="Phone" onChange={e => doc.phone = e.target.value} required/>
                             <label for="Major"><b>Major</b></label>
-                            <input type="text" placeholder="Major" name="Major" onChange={e => doc.major = e.target.value} required/>
+                            <input type="text" placeholder="Enter Major" name="Major" onChange={e => doc.major = e.target.value} required/>
                             <label for="housing"><b>Housing Location</b></label>
-                            <input type="text" placeholder="Housing Location" name="housing" onChange={e => doc.housing = e.target.value} required/>
+                            <input type="text" placeholder="Enter Housing Location" name="housing" onChange={e => doc.housing = e.target.value} required/>
                             <label for="Date"><b>Photo</b></label>
                             <input type="file" placeholder="Upload Photo" name="photo" onChange={e => handleSetPhoto(e.target.files[0])} required />
                             <div>

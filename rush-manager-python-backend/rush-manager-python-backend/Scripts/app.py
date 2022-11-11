@@ -348,8 +348,10 @@ def hello():
   return "Connected to python!"
 
 def redisAddRushee(name, username):
-  if not redis:
-    return False
+  try:
+    res = redis.smembers()
+  except:
+    return False #redis down
   redis.sadd(name, username)
   split = name.split(" ")
   try:
@@ -361,8 +363,10 @@ def redisAddRushee(name, username):
   return True
 
 def redisDeleteRushee(name, username):
-  if not redis:
-    return False
+  try:
+    res = redis.smembers()
+  except:
+    return False #redis down
   redis.srem(name, username)
   split = name.split(" ")
   try:
@@ -468,12 +472,20 @@ def createUser():
     data = request.get_json().get('body')
 
   # print(data)
-  if(data.get('accountType') == "brother"):
-    addUser(data, "requestedBrother")
-  if(data.get('accountType') == "rushee"):
-    addUser(data, "requestedRushee")
-  return []
-  
+  username = (data.get('username'))
+  unique = True
+  res = db.find({'selector': {'username': username}})
+  for item in res:
+    if(item['username'] == username):
+      unique = False
+  if(unique):
+    if(data.get('accountType') == "brother"):
+      addUser(data, "requestedBrother")
+    if(data.get('accountType') == "rushee"):
+      addUser(data, "requestedRushee")
+    return ["Added"]
+  else: 
+    return ["Not a unique username"]
 
 @app.route("/getRushees")
 def getRushees():
@@ -529,6 +541,8 @@ def addUser(data, type):
   try: 
     photo = data.get('photoURL')
   except: photo = None
+
+
   if(type == "brother" or type == "requestedBrother"):
     doc = {
     "type": type,
@@ -542,7 +556,7 @@ def addUser(data, type):
     "fraternity": "FIJI",
     "username": data.get('username'),
     "phone": data.get('phone'),
-    "photoURL": data.get('photoURL')
+    "photoURL": photo
     }
     if(type == "requestedBrother"):
       doc['type'] = "requestedBrother"
@@ -605,8 +619,21 @@ def addRushee():
   if request.method == 'POST':
     data = request.get_json().get('body')
     # print(data)
-  addUser(data, "rushee")
-  return "Rushee added"
+  username = (data.get('username'))
+  unique = True
+  try:
+    res = db.find({'selector': {'username': username}})
+    for item in res:
+      if(item['username'] == username):
+        unique = False
+    if(unique):
+      addUser(data, "rushee")
+      return ["Added"]
+    else:
+      return ["Not a unique username"]
+  except:
+    addUser(data, "rushee")
+    return ["Added"]
 
 @app.route("/isUniqueUserName", methods = ['POST'])
 def uniqueUsername():
@@ -664,11 +691,14 @@ def couchAddUser(doc):
 
   couchInit()
   try:
-  # if not db:
-  #   return False
-    res = db.save(doc)
-    #TODO 
-    #check what res returns if the save was unsuccessful
+    username = (doc.get('username'))
+    unique = True
+    res = db.find({'selector': {'username': username}})
+    for item in res:
+      if(item['username'] == username):
+        unique = False
+    if(unique):
+      res = db.save(doc)
     return True
   except:
     return False
@@ -737,9 +767,17 @@ def addBrother():
   # print("ADDING BROTHER")
   if request.method == 'POST':
     data = request.get_json().get('body')
-  addUser(data, "brother")
-  return "Brother added"
-
+  username = (data.get('username'))
+  unique = True
+  res = db.find({'selector': {'username': username}})
+  for item in res:
+    if(item['username'] == username):
+      unique = False
+  if(unique):
+    addUser(data, "brother")
+    return ["Added"]
+  else:
+    return ["Not a unique username"]
 
 @app.route("/deleteBrother", methods = ['POST'])
 def deleteBrother():
@@ -1025,6 +1063,8 @@ def addEvent():
   data = ""
   if request.method == 'POST':
     data = request.get_json()
+
+  
   
   queue("TODO%&%addEvent%&%" + data["name"] + "%&%" + data["date"])
   return {}
@@ -1050,6 +1090,19 @@ def addRSVP():
   if request.method == 'POST':
     data = request.get_json().get('body')
   # print(data)
+  # newEvents = []
+  # for item in events:
+  #   if(item.get('name') == data["event"]):
+  #     temp = []
+  #     temp = item['attended']
+  #     if(temp.contains(data["username"])):
+  #       temp.remove(data["username"])
+  #     else:
+  #       temp.append(data["username"])
+
+  #     item['attended'] = temp
+  #   newEvents.append(item)
+  # events = newEvents
 
   queue("TODO%&%changeRSVP%&%" + data["event"] + "%&%" + data["username"])
   return {}

@@ -124,7 +124,8 @@ app.post("/addBrother", (req, res1) => {
     if (err) {
       return console.log(err);
     }
-    res1.send("Added")
+    console.log(body)
+    res1.send(body)
   });
 
 })
@@ -137,7 +138,8 @@ app.post("/addRushee", (req, res1) => {
     if (err) {
       return console.log(err);
     }
-    res1.send("Added")
+    console.log(body)
+    res1.send(body)
   });
 
 })
@@ -203,7 +205,8 @@ app.post("/createUser", (req, res1) => {
     if (err) {
       return console.log(err);
     }
-    res1.send("Added")
+    console.log(body)
+    res1.send(body)
   });
 
 })
